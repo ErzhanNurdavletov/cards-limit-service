@@ -9,6 +9,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
+@Table(name = "limits_histories")
 @Data
 @NoArgsConstructor
 public class LimitsHistory {

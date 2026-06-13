@@ -1,6 +1,7 @@
 package kg.bakaibank.cardslimitservice.entity;
 
 import jakarta.persistence.*;
+import kg.bakaibank.cardslimitservice.entity.enums.ClientType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
+@Table(name = "clients")
 @Data
 @NoArgsConstructor
 public class Client {
@@ -19,10 +21,10 @@ public class Client {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "firstname")
+    @Column(name = "firstname", nullable = false, length = 50)
     private String firstname;
 
-    @Column(name = "lastname")
+    @Column(name = "lastname", nullable = false, length = 50)
     private String lastname;
 
     @Column(name = "patronymic")
@@ -31,8 +33,9 @@ public class Client {
     @OneToMany
     private Set<Card> cards = new HashSet<>();
 
-    @Column(name = "client_type", nullable = false)
-    private String type;
+    @Column(name = "client_type", nullable = false, length = 10)
+    @Enumerated(EnumType.STRING)
+    private ClientType type;
 
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;

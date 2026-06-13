@@ -9,6 +9,6 @@ import java.util.UUID;
 
 @Repository
 public interface ClientRepository extends JpaRepository<Client, UUID> {
-    Client deleteClientById(UUID id);
     Optional<Client> findClientById(UUID id);
+    Optional<Client> findByDeletedAtIsNullAndId(UUID id);
 }

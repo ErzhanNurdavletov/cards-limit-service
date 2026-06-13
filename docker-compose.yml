@@ -1,0 +1,10 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: limit_db
+    environment:
+      POSTGRES_DB: limit_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+    ports:
+      - "5433:5432"

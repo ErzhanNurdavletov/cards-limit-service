@@ -7,24 +7,27 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 @Entity
+@Table(name = "cards_limits")
 @Data
 @NoArgsConstructor
-public class CardsLimits {
+public class CardCustomLimit {
 
-    @Id
-    private Long id;
+    @EmbeddedId
+    private CardCustomLimitCompositeKey id;
 
     @ManyToOne
+    @MapsId("cardId")
     @JoinColumn(name = "card_id")
     private Card card;
 
     @ManyToOne
+    @MapsId("limitId")
     @JoinColumn(name = "limit_id")
-    private Card limit;
+    private Limit limit;
 
     @Column(name = "current_amount", precision = 15, scale = 2, nullable = false)
-    private BigDecimal currentAmount;
+    private BigDecimal currentAmount = new BigDecimal("200000.00");
 
     @Column(name = "current_count", nullable = false)
-    private Integer currentCount;
+    private Integer currentCount = 2000;
 }

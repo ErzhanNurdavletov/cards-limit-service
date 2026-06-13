@@ -1,8 +1,8 @@
 package kg.bakaibank.cardslimitservice.controller;
 
-import kg.bakaibank.cardslimitservice.dto.ClientRequest;
-import kg.bakaibank.cardslimitservice.dto.ClientResponse;
-import kg.bakaibank.cardslimitservice.dto.ClientUpdateRequest;
+import kg.bakaibank.cardslimitservice.payload.request.ClientCreateRequest;
+import kg.bakaibank.cardslimitservice.payload.response.ClientResponse;
+import kg.bakaibank.cardslimitservice.payload.request.ClientUpdateRequest;
 import kg.bakaibank.cardslimitservice.service.ClientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,8 +19,8 @@ public class ClientController {
 
     @PostMapping
     public ResponseEntity<?> createClient(
-        @RequestBody ClientRequest clientRequest) {
-        ClientResponse response = clientService.createClient(clientRequest);
+        @RequestBody ClientCreateRequest clientCreateRequest) {
+        ClientResponse response = clientService.createClient(clientCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -37,7 +37,8 @@ public class ClientController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> changeClientById(@PathVariable UUID id, @RequestBody ClientUpdateRequest request) {
+    public ResponseEntity<?> changeClientById(@PathVariable UUID id,
+                                              @RequestBody ClientUpdateRequest request) {
         ClientResponse clientResponse = clientService.changeClientById(id, request);
         return ResponseEntity.status(HttpStatus.OK).body(clientResponse);
     }

@@ -1,15 +1,16 @@
 package kg.bakaibank.cardslimitservice.entity;
 
 import jakarta.persistence.*;
+import kg.bakaibank.cardslimitservice.entity.enums.CardStatus;
+import kg.bakaibank.cardslimitservice.entity.enums.CardType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Generated;
 import java.time.OffsetDateTime;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
 @Entity
+@Table(name = "cards")
 @Data
 @NoArgsConstructor
 public class Card {
@@ -23,37 +24,23 @@ public class Card {
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 
-    @Column(name = "masked_pan", nullable = false)
+    @Column(name = "masked_pan", nullable = false, length = 19)
     private String maskedPan;
 
-    @Column(name = "type", nullable = false)
-    private String type;
+    @Column(name = "type", nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
+    private CardType type;
 
-    @Column(name = "status", nullable = false)
-    @Generated
-    private String status;
+    @Column(name = "status", nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
+    private CardStatus status;
 
-    @ManyToMany
-    @JoinTable(
-        name = "cards_limits",
-        joinColumns = @JoinColumn(name = "card_id"),
-        inverseJoinColumns = @JoinColumn(name = "limit_id")
-    )
-    private Set<Limit> limits = new HashSet<>();
+    @OneToMany(mappedBy = "card")
+    private Set<CardCustomLimit> customLimits;
 
-    @Column(name = "opened_at", nullable = false)
+    @Column(name = "opened_at")
     private OffsetDateTime openedAt;
 
     @Column(name = "deleted_at")
     private OffsetDateTime deletedAt;
-
-    public void addLimit(Limit limit) {
-        limits.add(limit);
-        limit.getCards().add(this);
-    }
-
-    public void removeLimit(Limit limit) {
-        limits.remove(limit);
-        limit.getCards().remove(this);
-    }
 }

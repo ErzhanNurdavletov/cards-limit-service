@@ -1,11 +1,11 @@
 package kg.bakaibank.cardslimitservice.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import kg.bakaibank.cardslimitservice.dto.ClientRequest;
-import kg.bakaibank.cardslimitservice.dto.ClientResponse;
-import kg.bakaibank.cardslimitservice.dto.ClientUpdateRequest;
+import kg.bakaibank.cardslimitservice.payload.request.ClientCreateRequest;
+import kg.bakaibank.cardslimitservice.payload.response.ClientResponse;
 import kg.bakaibank.cardslimitservice.entity.Client;
 import kg.bakaibank.cardslimitservice.mapper.ClientMapper;
+import kg.bakaibank.cardslimitservice.payload.request.ClientUpdateRequest;
 import kg.bakaibank.cardslimitservice.repository.ClientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,8 +22,8 @@ public class ClientService {
     private final ClientMapper clientMapper;
 
     @Transactional
-    public ClientResponse createClient(ClientRequest clientRequest) {
-        Client client = clientMapper.toEntity(clientRequest);
+    public ClientResponse createClient(ClientCreateRequest clientCreateRequest) {
+        Client client = clientMapper.toEntity(clientCreateRequest);
         client.setCreatedAt(OffsetDateTime.now());
         clientRepository.save(client);
         return clientMapper.toResponse(client);
@@ -31,7 +31,10 @@ public class ClientService {
 
     @Transactional
     public ClientResponse deleteClientById(UUID id) {
-        Client client = clientRepository.deleteClientById(id);
+        Client client = clientRepository.findByDeletedAtIsNullAndId(id)
+            .orElseThrow(() -> new EntityNotFoundException("Client not found"));
+        client.setDeletedAt(OffsetDateTime.now());
+        clientRepository.save(client);
         return clientMapper.toResponse(client);
     }
 
@@ -43,9 +46,12 @@ public class ClientService {
 
     @Transactional
     public ClientResponse changeClientById(UUID id, ClientUpdateRequest request) {
+        if (!id.equals(request.id())) {
+            throw new IllegalArgumentException("Client id is not equal to request id");
+        }
         Client client = clientRepository.findClientById(id).orElseThrow(EntityNotFoundException::new);
         clientMapper.updateEntity(client, request);
-        Client updatedClient = clientRepository.save(client);
-        return clientMapper.toResponse(updatedClient);
+        clientRepository.save(client);
+        return clientMapper.toResponse(client);
     }
 }

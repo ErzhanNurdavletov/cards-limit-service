@@ -1,11 +1,15 @@
 package kg.bakaibank.cardslimitservice.repository;
 
 import kg.bakaibank.cardslimitservice.entity.Card;
+import kg.bakaibank.cardslimitservice.entity.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface CardRepository extends JpaRepository<Card, UUID> {
+    Optional<Card> findCardById(UUID id);
+    Optional<Card> findByDeletedAtIsNullAndId(UUID id);
 }

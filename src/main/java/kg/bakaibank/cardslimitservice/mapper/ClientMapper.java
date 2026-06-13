@@ -1,14 +1,15 @@
 package kg.bakaibank.cardslimitservice.mapper;
 
-import kg.bakaibank.cardslimitservice.dto.ClientRequest;
-import kg.bakaibank.cardslimitservice.dto.ClientResponse;
-import kg.bakaibank.cardslimitservice.dto.ClientUpdateRequest;
+import kg.bakaibank.cardslimitservice.payload.request.ClientCreateRequest;
+import kg.bakaibank.cardslimitservice.payload.response.ClientResponse;
+import kg.bakaibank.cardslimitservice.payload.request.ClientUpdateRequest;
 import kg.bakaibank.cardslimitservice.entity.Client;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface ClientMapper {
-    Client toEntity(ClientRequest clientRequest);
+    Client toEntity(ClientCreateRequest clientCreateRequest);
     ClientResponse toResponse(Client client);
-    Client updateEntity(Client client, ClientUpdateRequest request);
+    void updateEntity(@MappingTarget Client client, ClientUpdateRequest request);
 }

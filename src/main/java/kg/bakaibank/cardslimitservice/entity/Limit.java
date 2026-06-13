@@ -6,11 +6,11 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
 @Entity
+@Table(name = "limits")
 @Data
 @NoArgsConstructor
 public class Limit {
@@ -20,8 +20,8 @@ public class Limit {
     @Column(name = "limit_id")
     private UUID id;
 
-    @ManyToMany(mappedBy = "limits")
-    private Set<Card> cards = new HashSet<>();
+    @OneToMany(mappedBy = "limit")
+    private Set<CardCustomLimit> cardsCustomLimits;
 
     @Column(name = "name", length = 50, nullable = false)
     private String name;
@@ -33,10 +33,10 @@ public class Limit {
     private Integer maxCount;
 
     @Column(name = "default_amount", nullable = false)
-    private BigDecimal defaultAmount = new BigDecimal("50000.00");
+    private BigDecimal defaultAmount;
 
     @Column(name = "default_count", nullable = false)
-    private Integer defaultCount = 2000;
+    private Integer defaultCount;
 
     @Column(name = "deleted_at")
     private OffsetDateTime deletedAt;

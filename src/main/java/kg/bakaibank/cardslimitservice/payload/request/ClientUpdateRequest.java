@@ -1,4 +1,6 @@
-package kg.bakaibank.cardslimitservice.dto;
+package kg.bakaibank.cardslimitservice.payload.request;
+
+import kg.bakaibank.cardslimitservice.entity.enums.ClientType;
 
 import java.util.UUID;
 
@@ -7,7 +9,7 @@ public record ClientUpdateRequest(
     String firstname,
     String lastname,
     String patronymic,
-    String type,
+    ClientType type,
     String phoneNumber
 ) {
 }
