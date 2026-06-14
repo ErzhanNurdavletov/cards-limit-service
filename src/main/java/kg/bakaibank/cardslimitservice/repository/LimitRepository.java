@@ -10,5 +10,6 @@ import java.util.UUID;
 @Repository
 public interface LimitRepository extends JpaRepository<Limit, UUID> {
     Optional<Limit> findLimitById(UUID id);
+    Optional<Limit> findLimitByName(String name);
     Optional<Limit> findByDeletedAtIsNullAndId(UUID id);
 }

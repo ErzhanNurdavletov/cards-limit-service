@@ -1,8 +1,7 @@
 package kg.bakaibank.cardslimitservice.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -11,6 +10,8 @@ import java.util.UUID;
 @Entity
 @Table(name = "limits_histories")
 @Data
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class LimitsHistory {
 
@@ -32,10 +33,10 @@ public class LimitsHistory {
     private BigDecimal newAmount;
 
     @Column(name = "old_count")
-    private BigDecimal oldCount;
+    private Integer oldCount;
 
     @Column(name = "new_count", nullable = false)
-    private BigDecimal newCount;
+    private Integer newCount;
 
     @Column(name = "changed_at", nullable = false)
     private OffsetDateTime changedAt;

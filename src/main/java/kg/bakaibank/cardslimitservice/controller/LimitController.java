@@ -1,6 +1,5 @@
 package kg.bakaibank.cardslimitservice.controller;
 
-import kg.bakaibank.cardslimitservice.entity.Limit;
 import kg.bakaibank.cardslimitservice.payload.request.LimitCreateRequest;
 import kg.bakaibank.cardslimitservice.payload.request.LimitUpdateRequest;
 import kg.bakaibank.cardslimitservice.payload.response.LimitResponse;

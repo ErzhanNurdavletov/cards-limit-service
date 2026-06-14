@@ -2,13 +2,15 @@ package kg.bakaibank.cardslimitservice.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.Data;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.UUID;
 
 @Embeddable
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(of = {"cardId", "limitId"})
 public class CardCustomLimitCompositeKey implements Serializable {
 
     @Column(name = "card_id")

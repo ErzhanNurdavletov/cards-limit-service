@@ -2,8 +2,7 @@ package kg.bakaibank.cardslimitservice.entity;
 
 import jakarta.persistence.*;
 import kg.bakaibank.cardslimitservice.entity.enums.ClientType;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.OffsetDateTime;
 import java.util.HashSet;
@@ -12,8 +11,12 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "clients")
-@Data
+@Getter
+@Setter
+@Builder
+@EqualsAndHashCode(of = "id")
 @NoArgsConstructor
+@AllArgsConstructor
 public class Client {
 
     @Id

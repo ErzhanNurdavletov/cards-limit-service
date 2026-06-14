@@ -3,21 +3,24 @@ package kg.bakaibank.cardslimitservice.entity;
 import jakarta.persistence.*;
 import kg.bakaibank.cardslimitservice.entity.enums.CardStatus;
 import kg.bakaibank.cardslimitservice.entity.enums.CardType;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import java.time.OffsetDateTime;
 import java.util.Set;
 import java.util.UUID;
 
 @Entity
 @Table(name = "cards")
-@Data
+@Getter
+@Setter
+@Builder
+@EqualsAndHashCode(of = "id")
 @NoArgsConstructor
+@AllArgsConstructor
 public class Card {
 
     @Id
     @Column(name = "card_id")
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne

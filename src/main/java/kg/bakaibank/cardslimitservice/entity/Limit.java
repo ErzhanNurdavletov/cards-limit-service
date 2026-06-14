@@ -1,6 +1,8 @@
 package kg.bakaibank.cardslimitservice.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,7 +14,9 @@ import java.util.UUID;
 @Entity
 @Table(name = "limits")
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class Limit {
 
     @Id
@@ -23,7 +27,7 @@ public class Limit {
     @OneToMany(mappedBy = "limit")
     private Set<CardCustomLimit> cardsCustomLimits;
 
-    @Column(name = "name", length = 50, nullable = false)
+    @Column(name = "name", length = 50, nullable = false, unique = true)
     private String name;
 
     @Column(name = "max_amount", precision = 15, scale = 2, nullable = false)

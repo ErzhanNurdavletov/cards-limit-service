@@ -1,7 +1,9 @@
 package kg.bakaibank.cardslimitservice.controller;
 
 import kg.bakaibank.cardslimitservice.payload.request.CardCreateRequest;
+import kg.bakaibank.cardslimitservice.payload.request.CardLimitUpdateRequest;
 import kg.bakaibank.cardslimitservice.payload.request.CardUpdateRequest;
+import kg.bakaibank.cardslimitservice.payload.response.CardLimitResponse;
 import kg.bakaibank.cardslimitservice.payload.response.CardResponse;
 import kg.bakaibank.cardslimitservice.service.CardService;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -23,22 +26,36 @@ public class CardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateCard(@PathVariable UUID id,
+    @PutMapping("/{cardId}")
+    public ResponseEntity<?> updateCard(@PathVariable UUID cardId,
                                          @RequestBody CardUpdateRequest request) {
-        CardResponse response = cardService.updateCard(id, request);
+        CardResponse response = cardService.updateCard(cardId, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCard(@PathVariable UUID id) {
-        CardResponse response = cardService.deleteCard(id);
+    @DeleteMapping("/{cardId}")
+    public ResponseEntity<?> deleteCard(@PathVariable UUID cardId) {
+        CardResponse response = cardService.deleteCard(cardId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getCard(@PathVariable UUID id) {
-        CardResponse response = cardService.getCardById(id);
+    @GetMapping("/{cardId}")
+    public ResponseEntity<?> getCard(@PathVariable UUID cardId) {
+        CardResponse response = cardService.getCardById(cardId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/{cardId}/current-limits")
+    public ResponseEntity<?> getCardLimits(@PathVariable UUID cardId) {
+        Set<CardLimitResponse> responses = cardService.getCardLimits(cardId);
+        return ResponseEntity.status(HttpStatus.OK).body(responses);
+    }
+
+    @PutMapping("/{cardId}/limits/{limitId}")
+    public ResponseEntity<?> updateCardLimit(@PathVariable UUID cardId,
+                                             @PathVariable UUID limitId,
+                                             @RequestBody CardLimitUpdateRequest request) {
+        CardLimitResponse response = cardService.updateCardLimit(cardId, limitId, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
