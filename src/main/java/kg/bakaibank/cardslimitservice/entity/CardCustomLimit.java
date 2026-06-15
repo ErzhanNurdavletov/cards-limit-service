@@ -23,7 +23,7 @@ public class CardCustomLimit {
     @JoinColumn(name = "card_id")
     private Card card;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("limitId")
     @JoinColumn(name = "limit_id")
     private Limit limit;

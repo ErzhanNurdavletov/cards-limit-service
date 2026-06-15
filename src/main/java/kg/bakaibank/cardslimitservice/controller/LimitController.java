@@ -1,5 +1,6 @@
 package kg.bakaibank.cardslimitservice.controller;
 
+import jakarta.validation.Valid;
 import kg.bakaibank.cardslimitservice.payload.request.LimitCreateRequest;
 import kg.bakaibank.cardslimitservice.payload.request.LimitUpdateRequest;
 import kg.bakaibank.cardslimitservice.payload.response.LimitResponse;
@@ -18,14 +19,14 @@ public class LimitController {
     private final LimitService limitService;
 
     @PostMapping
-    public ResponseEntity<?> createLimit(@RequestBody LimitCreateRequest request) {
+    public ResponseEntity<?> createLimit(@Valid @RequestBody LimitCreateRequest request) {
         LimitResponse response = limitService.createLimit(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateLimit(@PathVariable UUID id,
-                                         @RequestBody LimitUpdateRequest request) {
+                                         @Valid @RequestBody LimitUpdateRequest request) {
         LimitResponse response = limitService.changeLimitById(id, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

@@ -11,5 +11,8 @@ import java.util.Set;
 @Mapper(componentModel = "spring")
 public interface CardCustomLimitMapper {
     Set<CardLimitResponse> toCardLimitsResponses(Set<CardCustomLimit> cardLimits);
+
+    @Mapping(target = "limitId", source = "limit.id")
+    @Mapping(target = "limitName", source = "limit.name")
     CardLimitResponse toResponse(CardCustomLimit cardCustomLimit);
 }

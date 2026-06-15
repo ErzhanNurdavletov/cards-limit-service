@@ -1,10 +1,12 @@
 package kg.bakaibank.cardslimitservice.controller;
 
+import jakarta.validation.Valid;
 import kg.bakaibank.cardslimitservice.payload.request.CardCreateRequest;
 import kg.bakaibank.cardslimitservice.payload.request.CardLimitUpdateRequest;
 import kg.bakaibank.cardslimitservice.payload.request.CardUpdateRequest;
 import kg.bakaibank.cardslimitservice.payload.response.CardLimitResponse;
 import kg.bakaibank.cardslimitservice.payload.response.CardResponse;
+import kg.bakaibank.cardslimitservice.service.CardCustomLimitService;
 import kg.bakaibank.cardslimitservice.service.CardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,16 +21,17 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CardController {
     private final CardService cardService;
+    private final CardCustomLimitService cardCustomLimitService;
 
     @PostMapping
-    public ResponseEntity<?> createCard(@RequestBody CardCreateRequest request) {
+    public ResponseEntity<?> createCard(@Valid @RequestBody CardCreateRequest request) {
         CardResponse response = cardService.createCard(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{cardId}")
     public ResponseEntity<?> updateCard(@PathVariable UUID cardId,
-                                         @RequestBody CardUpdateRequest request) {
+                                         @Valid @RequestBody CardUpdateRequest request) {
         CardResponse response = cardService.updateCard(cardId, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -54,8 +57,8 @@ public class CardController {
     @PutMapping("/{cardId}/limits/{limitId}")
     public ResponseEntity<?> updateCardLimit(@PathVariable UUID cardId,
                                              @PathVariable UUID limitId,
-                                             @RequestBody CardLimitUpdateRequest request) {
-        CardLimitResponse response = cardService.updateCardLimit(cardId, limitId, request);
+                                             @Valid @RequestBody CardLimitUpdateRequest request) {
+        CardLimitResponse response = cardCustomLimitService.updateCardLimit(cardId, limitId, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

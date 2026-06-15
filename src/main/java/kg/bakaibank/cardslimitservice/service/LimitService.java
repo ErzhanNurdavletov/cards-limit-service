@@ -44,12 +44,14 @@ public class LimitService {
 
     @Transactional
     public LimitResponse changeLimitById(UUID id, LimitUpdateRequest request) {
-        if (!id.equals(request.id())) {
-            throw new IllegalArgumentException();
-        }
         Limit limit = limitRepository.findLimitById(id).orElseThrow(EntityNotFoundException::new);
         limitMapper.updateEntity(limit, request);
         limitRepository.save(limit);
         return limitMapper.toResponse(limit);
+    }
+
+    public Limit getLimitByName(String name) {
+        return limitRepository.findLimitByName(name)
+            .orElseThrow(EntityNotFoundException::new);
     }
 }

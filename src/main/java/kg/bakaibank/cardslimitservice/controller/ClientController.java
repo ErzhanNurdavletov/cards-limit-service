@@ -1,5 +1,6 @@
 package kg.bakaibank.cardslimitservice.controller;
 
+import jakarta.validation.Valid;
 import kg.bakaibank.cardslimitservice.payload.request.ClientCreateRequest;
 import kg.bakaibank.cardslimitservice.payload.response.ClientResponse;
 import kg.bakaibank.cardslimitservice.payload.request.ClientUpdateRequest;
@@ -19,7 +20,7 @@ public class ClientController {
 
     @PostMapping
     public ResponseEntity<?> createClient(
-        @RequestBody ClientCreateRequest clientCreateRequest) {
+        @Valid @RequestBody ClientCreateRequest clientCreateRequest) {
         ClientResponse response = clientService.createClient(clientCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -38,7 +39,7 @@ public class ClientController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> changeClientById(@PathVariable UUID id,
-                                              @RequestBody ClientUpdateRequest request) {
+                                              @Valid @RequestBody ClientUpdateRequest request) {
         ClientResponse clientResponse = clientService.changeClientById(id, request);
         return ResponseEntity.status(HttpStatus.OK).body(clientResponse);
     }

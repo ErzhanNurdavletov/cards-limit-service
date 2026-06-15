@@ -1,11 +1,11 @@
 package kg.bakaibank.cardslimitservice.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import kg.bakaibank.cardslimitservice.config.DefaultLimitsConfig;
 import kg.bakaibank.cardslimitservice.entity.*;
 import kg.bakaibank.cardslimitservice.mapper.CardCustomLimitMapper;
 import kg.bakaibank.cardslimitservice.mapper.CardMapper;
 import kg.bakaibank.cardslimitservice.payload.request.CardCreateRequest;
-import kg.bakaibank.cardslimitservice.payload.request.CardLimitUpdateRequest;
 import kg.bakaibank.cardslimitservice.payload.request.CardUpdateRequest;
 import kg.bakaibank.cardslimitservice.payload.response.CardLimitResponse;
 import kg.bakaibank.cardslimitservice.payload.response.CardResponse;
@@ -23,85 +23,50 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CardService {
     private final CardRepository cardRepository;
-    private final ClientRepository clientRepository;
-    private final LimitRepository limitRepository;
-    private final LimitsHistoryRepository limitsHistoryRepository;
-    private final CardCustomLimitRepository cardCustomLimitRepository;
+    private final ClientService clientService;
+    private final LimitService limitService;
+    private final LimitsHistoryService limitsHistoryService;
+    private final CardCustomLimitService cardCustomLimitService;
     private final CardMapper cardMapper;
     private final CardCustomLimitMapper cardCustomLimitMapper;
+    private final DefaultLimitsConfig defaultLimitsConfig;
 
     @Transactional
     public CardResponse createCard(CardCreateRequest request) {
-        Client client = clientRepository.findClientById(request.clientId())
-            .orElseThrow(EntityNotFoundException::new);
+        Client client = clientService.getClientEntityById(request.clientId());
 
         Card card = cardMapper.toEntity(request);
         card.setClient(client);
-        card.setOpenedAt(OffsetDateTime.now());
         card.setId(UUID.randomUUID());
+        card.setOpenedAt(OffsetDateTime.now());
+        // end date +3
+        // card type table
+        // card issue type
+        card.setCustomLimits(new HashSet<>());
+        cardRepository.save(card);
 
-        Limit cashInLimit = limitRepository.findLimitByName("standart-cashin")
-            .orElseThrow(EntityNotFoundException::new);
-        Limit cashOutLimit = limitRepository.findLimitByName("standart-cashout")
-            .orElseThrow(EntityNotFoundException::new);
+        Limit cashInLimit = limitService.getLimitByName(defaultLimitsConfig.getCashIn());
+        Limit cashOutLimit = limitService.getLimitByName(defaultLimitsConfig.getCashOut());
+
+        addDefaultLimitsToCard(card, cashInLimit);
+        addDefaultLimitsToCard(card, cashOutLimit);
+
+        limitsHistoryService.createLimitHistory(card, cashInLimit);
+        limitsHistoryService.createLimitHistory(card, cashOutLimit);
 
         cardRepository.save(card);
-        CardCustomLimit customCashInLimit = createCardCustomLimit(card, cashInLimit);
-        CardCustomLimit customCashOutLimit = createCardCustomLimit(card, cashOutLimit);
-        cardCustomLimitRepository.save(customCashInLimit);
-        cardCustomLimitRepository.save(customCashOutLimit);
+        return cardMapper.toCreateResponse(card, request.clientId());
+    }
 
-        Set<CardCustomLimit> customLimits = new HashSet<>();
-        customLimits.add(customCashInLimit);
-        customLimits.add(customCashOutLimit);
-
-        card.setCustomLimits(customLimits);
-
-        if (cashInLimit.getCardsCustomLimits() == null) {
-            cashInLimit.setCardsCustomLimits(new HashSet<>());
+    private void addDefaultLimitsToCard(Card card, Limit limit) {
+        CardCustomLimit customCashInLimit =
+            cardCustomLimitService.createCardCustomLimit(card, limit);
+        cardCustomLimitService.save(customCashInLimit);
+        card.getCustomLimits().add(customCashInLimit);
+        if (limit.getCardsCustomLimits() == null) {
+            limit.setCardsCustomLimits(new HashSet<>());
         }
-        if (cashOutLimit.getCardsCustomLimits() == null) {
-            cashOutLimit.setCardsCustomLimits(new HashSet<>());
-        }
-
-        cashInLimit.getCardsCustomLimits().add(customCashInLimit);
-        cashOutLimit.getCardsCustomLimits().add(customCashOutLimit);
-
-        createLimitHistory(card, cashInLimit);
-        createLimitHistory(card, cashOutLimit);
-
-        cardRepository.save(card);
-        return cardMapper.toResponse(card);
-    }
-
-    private CardCustomLimit createCardCustomLimit(Card card, Limit limit) {
-        CardCustomLimitCompositeKey compositeKey = getCompositeKey(card, limit);
-
-        CardCustomLimit customLimit = new CardCustomLimit();
-        customLimit.setId(compositeKey);
-        customLimit.setCard(card);
-        customLimit.setLimit(limit);
-        customLimit.setCurrentAmount(limit.getDefaultAmount());
-        customLimit.setCurrentCount(limit.getDefaultCount());
-        return customLimit;
-    }
-
-    private CardCustomLimitCompositeKey getCompositeKey(Card card, Limit limit) {
-        CardCustomLimitCompositeKey compositeKey = new CardCustomLimitCompositeKey();
-        compositeKey.setCardId(card.getId());
-        compositeKey.setLimitId(limit.getId());
-        return compositeKey;
-    }
-
-
-    private void createLimitHistory(Card card, Limit cashInLimit) {
-        LimitsHistory cashInlimitsHistory = new LimitsHistory();
-        cashInlimitsHistory.setCardId(card.getId());
-        cashInlimitsHistory.setChangedAt(OffsetDateTime.now());
-        cashInlimitsHistory.setLimitId(cashInLimit.getId());
-        cashInlimitsHistory.setNewAmount(cashInLimit.getDefaultAmount());
-        cashInlimitsHistory.setNewCount(cashInLimit.getDefaultCount());
-        limitsHistoryRepository.save(cashInlimitsHistory);
+        limit.getCardsCustomLimits().add(customCashInLimit);
     }
 
     @Transactional
@@ -115,9 +80,6 @@ public class CardService {
 
     @Transactional
     public CardResponse updateCard(UUID id, CardUpdateRequest request) {
-        if (!id.equals(request.id())) {
-            throw new IllegalArgumentException();
-        }
         Card card = cardRepository.findCardById(id).orElseThrow(EntityNotFoundException::new);
         cardMapper.updateEntity(card, request);
         cardRepository.save(card);
@@ -138,20 +100,5 @@ public class CardService {
             throw new EntityNotFoundException();
         }
         return cardCustomLimitMapper.toCardLimitsResponses(card.getCustomLimits());
-    }
-
-    @Transactional
-    public CardLimitResponse updateCardLimit(UUID cardId, UUID limitId,
-                                             CardLimitUpdateRequest request) {
-        CardCustomLimitCompositeKey id = new CardCustomLimitCompositeKey();
-        id.setCardId(cardId);
-        id.setLimitId(limitId);
-        CardCustomLimit cardCustomLimit = cardCustomLimitRepository.findById(id)
-            .orElseThrow(EntityNotFoundException::new);
-
-        cardCustomLimit.setCurrentAmount(request.newAmount());
-        cardCustomLimit.setCurrentCount(request.newCount());
-        cardCustomLimitRepository.save(cardCustomLimit);
-        return cardCustomLimitMapper.toResponse(cardCustomLimit);
     }
 }
