@@ -40,12 +40,12 @@ public class CardController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @DeleteMapping("/{cardId}")
-    public ResponseEntity<?> deleteCard(@PathVariable UUID cardId) {
-        CardResponse response = cardService.deleteCard(cardId);
-        log.info("DELETE /api/v1/cards/{} - deleteCard response={}", cardId, response);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
+//    @DeleteMapping("/{cardId}")
+//    public ResponseEntity<?> deleteCard(@PathVariable UUID cardId) {
+//        CardResponse response = cardService.deleteCard(cardId);
+//        log.info("DELETE /api/v1/cards/{} - deleteCard response={}", cardId, response);
+//        return ResponseEntity.status(HttpStatus.OK).body(response);
+//    }
 
     @GetMapping("/{cardId}")
     public ResponseEntity<?> getCard(@PathVariable UUID cardId) {

@@ -10,5 +10,4 @@ import java.util.UUID;
 @Repository
 public interface CardRepository extends JpaRepository<Card, UUID> {
     Optional<Card> findCardById(UUID id);
-    Optional<Card> findByDeletedAtIsNullAndId(UUID id);
 }

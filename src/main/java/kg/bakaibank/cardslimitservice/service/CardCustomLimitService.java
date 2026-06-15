@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.UUID;
 
 @Service
@@ -23,7 +24,22 @@ import java.util.UUID;
 public class CardCustomLimitService {
 
     private final CardCustomLimitRepository cardCustomLimitRepository;
+    private final LimitsHistoryService limitsHistoryService;
     private final CardCustomLimitMapper cardCustomLimitMapper;
+
+    @Transactional
+    public void addDefaultLimitToCard(Card card, Limit limit) {
+        CardCustomLimit customLimit = createCardCustomLimit(card, limit);
+        cardCustomLimitRepository.save(customLimit);
+
+        card.getCustomLimits().add(customLimit);
+        if (limit.getCardsCustomLimits() == null) {
+            limit.setCardsCustomLimits(new HashSet<>());
+        }
+        limit.getCardsCustomLimits().add(customLimit);
+
+        log.info("Added default limit with id: {} to card with id: {}", limit.getId(), card.getId());
+    }
 
     public CardCustomLimit createCardCustomLimit(Card card, Limit limit) {
         CardCustomLimitCompositeKey compositeKey = getCompositeKey(card, limit);
@@ -49,15 +65,21 @@ public class CardCustomLimitService {
         BigDecimal oldAmount = cardCustomLimit.getCurrentAmount();
         Integer oldCount = cardCustomLimit.getCurrentCount();
 
+        Card card = cardCustomLimit.getCard();
+        Limit limit = cardCustomLimit.getLimit();
+        limitsHistoryService.createLimitHistory(card, limit,
+            oldAmount, oldCount,
+            request.newAmount(), request.newCount());
+
         cardCustomLimit.setCurrentAmount(request.newAmount());
         cardCustomLimit.setCurrentCount(request.newCount());
         cardCustomLimitRepository.save(cardCustomLimit);
+
         log.info("Updated card custom limit with id: {}." +
-            " oldAmount = {}, newAmount = {}. oldCount = {}, newCount = {}",
+                " oldAmount = {}, newAmount = {}. oldCount = {}, newCount = {}",
             id, oldAmount, cardCustomLimit.getCurrentAmount(),
             oldCount, cardCustomLimit.getCurrentCount());
         return cardCustomLimitMapper.toResponse(cardCustomLimit);
-
     }
 
     @Transactional

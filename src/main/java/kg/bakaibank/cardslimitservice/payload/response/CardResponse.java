@@ -12,6 +12,6 @@ public record CardResponse(
     CardType type,
     CardStatus status,
     OffsetDateTime openedAt,
-    OffsetDateTime deletedAt
+    OffsetDateTime closedAt
 ) {
 }

@@ -41,17 +41,15 @@ public class CardService {
         card.setClient(client);
         card.setId(UUID.randomUUID());
         card.setOpenedAt(OffsetDateTime.now());
-        // end date +3
-        // card type table
-        // card issue type
+        card.setClosedAt(OffsetDateTime.now().plusYears(3));
         card.setCustomLimits(new HashSet<>());
         cardRepository.save(card);
 
         Limit cashInLimit = limitService.getLimitByName(defaultLimitsConfig.getCashIn());
         Limit cashOutLimit = limitService.getLimitByName(defaultLimitsConfig.getCashOut());
 
-        addDefaultLimitsToCard(card, cashInLimit);
-        addDefaultLimitsToCard(card, cashOutLimit);
+        cardCustomLimitService.addDefaultLimitToCard(card, cashInLimit);
+        cardCustomLimitService.addDefaultLimitToCard(card, cashOutLimit);
 
         limitsHistoryService.createLimitHistory(card, cashInLimit);
         limitsHistoryService.createLimitHistory(card, cashOutLimit);
@@ -59,28 +57,6 @@ public class CardService {
         cardRepository.save(card);
         log.info("Saved card with id: {}", card.getId());
         return cardMapper.toCreateResponse(card, request.clientId());
-    }
-
-    private void addDefaultLimitsToCard(Card card, Limit limit) {
-        CardCustomLimit customCashInLimit =
-            cardCustomLimitService.createCardCustomLimit(card, limit);
-        cardCustomLimitService.save(customCashInLimit);
-        card.getCustomLimits().add(customCashInLimit);
-        if (limit.getCardsCustomLimits() == null) {
-            limit.setCardsCustomLimits(new HashSet<>());
-        }
-        limit.getCardsCustomLimits().add(customCashInLimit);
-        log.info("Added default limit with id: {} to card with id: {}", limit.getId(), card.getId());
-    }
-
-    @Transactional
-    public CardResponse deleteCard(UUID id) {
-        Card card = cardRepository.findByDeletedAtIsNullAndId(id)
-            .orElseThrow(EntityNotFoundException::new);
-        card.setDeletedAt(OffsetDateTime.now());
-        cardRepository.save(card);
-        log.info("Marked as deleted card with id: {}", id);
-        return cardMapper.toResponse(card);
     }
 
     @Transactional
@@ -102,10 +78,10 @@ public class CardService {
     @Transactional(readOnly = true)
     public Set<CardLimitResponse> getCardLimits(UUID cardId) {
         Card card = cardRepository.findCardById(cardId).orElseThrow(EntityNotFoundException::new);
-
-        if (card.getDeletedAt() != null) {
-            throw new EntityNotFoundException();
-        }
         return cardCustomLimitMapper.toCardLimitsResponses(card.getCustomLimits());
+    }
+
+    public Card getCardEntityById(UUID cardId) {
+        return cardRepository.findCardById(cardId).orElseThrow(EntityNotFoundException::new);
     }
 }

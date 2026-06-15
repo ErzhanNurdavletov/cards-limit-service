@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @Service
@@ -17,12 +18,28 @@ public class LimitsHistoryService {
     private final LimitsHistoryRepository limitsHistoryRepository;
 
     public void createLimitHistory(Card card, Limit limit) {
+        BigDecimal newAmount = limit.getDefaultAmount();
+        Integer newCount = limit.getDefaultCount();
+        createLimitHistory(card, limit,
+            null, null,
+            newAmount, newCount);
+    }
+
+    public void createLimitHistory(Card card,
+                                   Limit limit,
+                                   BigDecimal oldAmount,
+                                   Integer oldCount,
+                                   BigDecimal newAmount,
+                                   Integer newCount) {
+
         LimitsHistory limitHistory = new LimitsHistory();
         limitHistory.setCardId(card.getId());
         limitHistory.setChangedAt(OffsetDateTime.now());
         limitHistory.setLimitId(limit.getId());
-        limitHistory.setNewAmount(limit.getDefaultAmount());
-        limitHistory.setNewCount(limit.getDefaultCount());
+        limitHistory.setNewAmount(newAmount);
+        limitHistory.setNewCount(newCount);
+        limitHistory.setOldAmount(oldAmount);
+        limitHistory.setOldCount(oldCount);
         limitsHistoryRepository.save(limitHistory);
         log.info("Created limit history record with id: {}", limitHistory.getId());
     }

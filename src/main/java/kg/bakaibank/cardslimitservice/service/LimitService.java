@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -59,5 +58,9 @@ public class LimitService {
     public Limit getLimitByName(String name) {
         return limitRepository.findLimitByName(name)
             .orElseThrow(EntityNotFoundException::new);
+    }
+
+    public Limit getLimitEntityById(UUID id) {
+        return limitRepository.findLimitById(id).orElseThrow(EntityNotFoundException::new);
     }
 }

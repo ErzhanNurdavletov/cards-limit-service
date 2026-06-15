@@ -44,6 +44,10 @@ public class Card {
     @Column(name = "opened_at")
     private OffsetDateTime openedAt;
 
-    @Column(name = "deleted_at")
-    private OffsetDateTime deletedAt;
+    @Column(name = "closed_at")
+    private OffsetDateTime closedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "issue_type_id")
+    private CardIssueType issueType;
 }
