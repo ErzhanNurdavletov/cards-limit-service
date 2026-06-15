@@ -8,14 +8,17 @@ import kg.bakaibank.cardslimitservice.payload.request.LimitUpdateRequest;
 import kg.bakaibank.cardslimitservice.payload.response.LimitResponse;
 import kg.bakaibank.cardslimitservice.repository.LimitRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class LimitService {
     private final LimitRepository limitRepository;
     private final LimitMapper limitMapper;
@@ -24,6 +27,7 @@ public class LimitService {
     public LimitResponse createLimit(LimitCreateRequest request) {
         Limit limit = limitMapper.toEntity(request);
         limitRepository.save(limit);
+        log.info("Created limit with id: {}", limit.getId());
         return limitMapper.toResponse(limit);
     }
 
@@ -33,6 +37,7 @@ public class LimitService {
             .orElseThrow(EntityNotFoundException::new);
         limit.setDeletedAt(OffsetDateTime.now());
         limitRepository.save(limit);
+        log.info("Marked as deleted limit with id: {}", limit.getId());
         return limitMapper.toResponse(limit);
     }
 
@@ -47,6 +52,7 @@ public class LimitService {
         Limit limit = limitRepository.findLimitById(id).orElseThrow(EntityNotFoundException::new);
         limitMapper.updateEntity(limit, request);
         limitRepository.save(limit);
+        log.info("Updated limit with id: {}", limit.getId());
         return limitMapper.toResponse(limit);
     }
 

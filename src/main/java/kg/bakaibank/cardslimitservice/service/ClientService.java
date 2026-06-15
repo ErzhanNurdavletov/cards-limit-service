@@ -9,6 +9,7 @@ import kg.bakaibank.cardslimitservice.mapper.ClientMapper;
 import kg.bakaibank.cardslimitservice.payload.request.ClientUpdateRequest;
 import kg.bakaibank.cardslimitservice.repository.ClientRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ClientService {
 
     private final ClientRepository clientRepository;
@@ -27,6 +29,7 @@ public class ClientService {
         Client client = clientMapper.toEntity(clientCreateRequest);
         client.setCreatedAt(OffsetDateTime.now());
         clientRepository.save(client);
+        log.info("Created client with id: {}", client.getId());
         return clientMapper.toResponse(client);
     }
 
@@ -36,6 +39,7 @@ public class ClientService {
             .orElseThrow(() -> new EntityNotFoundException("Client not found"));
         client.setDeletedAt(OffsetDateTime.now());
         clientRepository.save(client);
+        log.info("Marked as deleted client with id: {}", client.getId());
         return clientMapper.toResponse(client);
     }
 
@@ -55,6 +59,7 @@ public class ClientService {
         Client client = clientRepository.findClientById(id).orElseThrow(EntityNotFoundException::new);
         clientMapper.updateEntity(client, request);
         clientRepository.save(client);
+        log.info("updated client with id: {}", client.getId());
         return clientMapper.toResponse(client);
     }
 }

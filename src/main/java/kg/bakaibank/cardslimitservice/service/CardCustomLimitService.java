@@ -10,12 +10,15 @@ import kg.bakaibank.cardslimitservice.payload.request.CardLimitUpdateRequest;
 import kg.bakaibank.cardslimitservice.payload.response.CardLimitResponse;
 import kg.bakaibank.cardslimitservice.repository.CardCustomLimitRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class CardCustomLimitService {
 
@@ -43,9 +46,16 @@ public class CardCustomLimitService {
         CardCustomLimit cardCustomLimit = cardCustomLimitRepository.findByIdWithLimitName(id)
             .orElseThrow(EntityNotFoundException::new);
 
+        BigDecimal oldAmount = cardCustomLimit.getCurrentAmount();
+        Integer oldCount = cardCustomLimit.getCurrentCount();
+
         cardCustomLimit.setCurrentAmount(request.newAmount());
         cardCustomLimit.setCurrentCount(request.newCount());
         cardCustomLimitRepository.save(cardCustomLimit);
+        log.info("Updated card custom limit with id: {}." +
+            " oldAmount = {}, newAmount = {}. oldCount = {}, newCount = {}",
+            id, oldAmount, cardCustomLimit.getCurrentAmount(),
+            oldCount, cardCustomLimit.getCurrentCount());
         return cardCustomLimitMapper.toResponse(cardCustomLimit);
 
     }
@@ -53,12 +63,14 @@ public class CardCustomLimitService {
     @Transactional
     public void save(CardCustomLimit cardCustomLimit) {
         cardCustomLimitRepository.save(cardCustomLimit);
+        log.info("Saved card's custom limit with id: {}", cardCustomLimit.getId());
     }
 
     private CardCustomLimitCompositeKey getCompositeKey(Card card, Limit limit) {
         CardCustomLimitCompositeKey compositeKey = new CardCustomLimitCompositeKey();
         compositeKey.setCardId(card.getId());
         compositeKey.setLimitId(limit.getId());
+        log.debug("created composite key with cardId: {} and limitId: {}", card.getId(), limit.getId());
         return compositeKey;
     }
 }

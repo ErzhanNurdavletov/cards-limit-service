@@ -6,6 +6,7 @@ import kg.bakaibank.cardslimitservice.payload.response.ClientResponse;
 import kg.bakaibank.cardslimitservice.payload.request.ClientUpdateRequest;
 import kg.bakaibank.cardslimitservice.service.ClientService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("api/v1/clients")
 @RequiredArgsConstructor
+@Slf4j
 public class ClientController {
     private final ClientService clientService;
 
@@ -22,18 +24,21 @@ public class ClientController {
     public ResponseEntity<?> createClient(
         @Valid @RequestBody ClientCreateRequest clientCreateRequest) {
         ClientResponse response = clientService.createClient(clientCreateRequest);
+        log.info("POST /api/v1/clients - createClient response={}", response);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteClient(@PathVariable UUID id) {
         ClientResponse response = clientService.deleteClientById(id);
+        log.info("DELETE /api/v1/clients/{} - deleteClient response={}", id, response);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getClientById(@PathVariable UUID id) {
         ClientResponse clientResponse = clientService.getClientById(id);
+        log.info("GET /api/v1/clients/{} - getClientById response={}", id, clientResponse);
         return ResponseEntity.status(HttpStatus.FOUND).body(clientResponse);
     }
 
@@ -41,6 +46,7 @@ public class ClientController {
     public ResponseEntity<?> changeClientById(@PathVariable UUID id,
                                               @Valid @RequestBody ClientUpdateRequest request) {
         ClientResponse clientResponse = clientService.changeClientById(id, request);
+        log.info("PUT /api/v1/clients/{} - changeClientById response={}", id, clientResponse);
         return ResponseEntity.status(HttpStatus.OK).body(clientResponse);
     }
 }

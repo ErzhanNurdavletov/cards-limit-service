@@ -39,6 +39,7 @@ public class GlobalExceptionHandler {
             .path(request.getRequestURI())
             .build();
 
+        log.warn("Handled not valid request");
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
@@ -50,6 +51,7 @@ public class GlobalExceptionHandler {
             .error(e.getMessage())
             .timestamp(OffsetDateTime.now())
             .build();
+        log.warn("Not found entity, message: {}", e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
@@ -64,6 +66,7 @@ public class GlobalExceptionHandler {
             .timestamp(OffsetDateTime.now())
             .build();
 
+        log.warn("some http parts are not valid, message: {}", e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
@@ -77,6 +80,7 @@ public class GlobalExceptionHandler {
             .timestamp(OffsetDateTime.now())
             .path(request.getRequestURI())
             .build();
+        log.warn("Illegal arguments were given, message: {}", e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
@@ -90,6 +94,7 @@ public class GlobalExceptionHandler {
             .timestamp(OffsetDateTime.now())
             .path(request.getRequestURI())
             .build();
+        log.warn("Not specified app exception handled, message: {}", e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 

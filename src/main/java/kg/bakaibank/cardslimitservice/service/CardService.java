@@ -11,6 +11,7 @@ import kg.bakaibank.cardslimitservice.payload.response.CardLimitResponse;
 import kg.bakaibank.cardslimitservice.payload.response.CardResponse;
 import kg.bakaibank.cardslimitservice.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CardService {
     private final CardRepository cardRepository;
     private final ClientService clientService;
@@ -55,6 +57,7 @@ public class CardService {
         limitsHistoryService.createLimitHistory(card, cashOutLimit);
 
         cardRepository.save(card);
+        log.info("Saved card with id: {}", card.getId());
         return cardMapper.toCreateResponse(card, request.clientId());
     }
 
@@ -67,6 +70,7 @@ public class CardService {
             limit.setCardsCustomLimits(new HashSet<>());
         }
         limit.getCardsCustomLimits().add(customCashInLimit);
+        log.info("Added default limit with id: {} to card with id: {}", limit.getId(), card.getId());
     }
 
     @Transactional
@@ -75,6 +79,7 @@ public class CardService {
             .orElseThrow(EntityNotFoundException::new);
         card.setDeletedAt(OffsetDateTime.now());
         cardRepository.save(card);
+        log.info("Marked as deleted card with id: {}", id);
         return cardMapper.toResponse(card);
     }
 
@@ -83,12 +88,14 @@ public class CardService {
         Card card = cardRepository.findCardById(id).orElseThrow(EntityNotFoundException::new);
         cardMapper.updateEntity(card, request);
         cardRepository.save(card);
+        log.info("Updated card with id: {}", id);
         return cardMapper.toResponse(card);
     }
 
     @Transactional(readOnly = true)
     public CardResponse getCardById(UUID id) {
         Card card = cardRepository.findCardById(id).orElseThrow(EntityNotFoundException::new);
+        log.debug("Given card info with id: {}", id);
         return cardMapper.toResponse(card);
     }
 
