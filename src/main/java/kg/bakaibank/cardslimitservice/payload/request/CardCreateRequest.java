@@ -22,6 +22,10 @@ public record CardCreateRequest(
     CardType type,
 
     @NotNull(message = "status can be only ACTIVE or BLOCKED")
-    CardStatus status
+    CardStatus status,
+
+    @NotBlank(message = "cardIssueTypeName can't be null or empty or blank")
+    @Size(max = 100, message = "cardIssueTypeName length can't be more than 100")
+    String cardIssueTypeName
 ) {
 }

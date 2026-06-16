@@ -33,7 +33,7 @@ public class LimitService {
     @Transactional
     public LimitResponse deleteLimit(UUID id) {
         Limit limit = limitRepository.findByDeletedAtIsNullAndId(id)
-            .orElseThrow(EntityNotFoundException::new);
+            .orElseThrow(() -> new EntityNotFoundException("Limit not found"));
         limit.setDeletedAt(OffsetDateTime.now());
         limitRepository.save(limit);
         log.info("Marked as deleted limit with id: {}", limit.getId());
@@ -42,13 +42,15 @@ public class LimitService {
 
     @Transactional(readOnly = true)
     public LimitResponse getLimitById(UUID id) {
-        Limit limit = limitRepository.findLimitById(id).orElseThrow(EntityNotFoundException::new);
+        Limit limit = limitRepository.findLimitById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Limit not found"));
         return limitMapper.toResponse(limit);
     }
 
     @Transactional
     public LimitResponse changeLimitById(UUID id, LimitUpdateRequest request) {
-        Limit limit = limitRepository.findLimitById(id).orElseThrow(EntityNotFoundException::new);
+        Limit limit = limitRepository.findLimitById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Limit not found"));
         limitMapper.updateEntity(limit, request);
         limitRepository.save(limit);
         log.info("Updated limit with id: {}", limit.getId());
@@ -57,10 +59,11 @@ public class LimitService {
 
     public Limit getLimitByName(String name) {
         return limitRepository.findLimitByName(name)
-            .orElseThrow(EntityNotFoundException::new);
+            .orElseThrow(() -> new EntityNotFoundException("Limit not found"));
     }
 
     public Limit getLimitEntityById(UUID id) {
-        return limitRepository.findLimitById(id).orElseThrow(EntityNotFoundException::new);
+        return limitRepository.findLimitById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Limit not found"));
     }
 }

@@ -1,6 +1,5 @@
 package kg.bakaibank.cardslimitservice.exception;
 
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +52,32 @@ public class GlobalExceptionHandler {
             .build();
         log.warn("Not found entity, message: {}", e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(NewAmountCountMoreThanMaxLimitException.class)
+    public ResponseEntity<?> handleNewAmountCountMoreThanMaxLimitException(
+        NewAmountCountMoreThanMaxLimitException e) {
+        ErrorResponse response = ErrorResponse.builder()
+            .message("New Count or(and) amount is bigger than max allowed values in limit")
+            .status(HttpStatus.BAD_REQUEST.value())
+            .error(e.getMessage())
+            .timestamp(OffsetDateTime.now())
+            .build();
+        log.warn("New Count or(and) amount is bigger than max allowed values, message: {}", e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(CardIsBlockedException.class)
+    public ResponseEntity<?> handleCardIsBlockedException(
+        CardIsBlockedException e) {
+        ErrorResponse response = ErrorResponse.builder()
+            .message("Not allowed to change BLOCKED card custom limit")
+            .status(HttpStatus.BAD_REQUEST.value())
+            .error(e.getMessage())
+            .timestamp(OffsetDateTime.now())
+            .build();
+        log.warn("Not allowed to change BLOCKED card custom limit, message: {}", e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

@@ -65,6 +65,7 @@ public class CardController {
     public ResponseEntity<?> updateCardLimit(@PathVariable UUID cardId,
                                              @PathVariable UUID limitId,
                                              @Valid @RequestBody CardLimitUpdateRequest request) {
+        log.info("PUT /api/v1/cards/{}/limits/{} - updateCardLimit request={}", cardId, limitId, request);
         CardLimitResponse response = cardCustomLimitService.updateCardLimit(cardId, limitId, request);
         log.info("PUT /api/v1/cards/{}/limits/{} - updateCardLimit response={}", cardId, limitId, response);
         return ResponseEntity.status(HttpStatus.OK).body(response);

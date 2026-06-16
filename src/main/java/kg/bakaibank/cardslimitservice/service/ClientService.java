@@ -1,7 +1,6 @@
 package kg.bakaibank.cardslimitservice.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import kg.bakaibank.cardslimitservice.exception.IdNotMatchBodyClientIdException;
 import kg.bakaibank.cardslimitservice.payload.request.ClientCreateRequest;
 import kg.bakaibank.cardslimitservice.payload.response.ClientResponse;
 import kg.bakaibank.cardslimitservice.entity.Client;
@@ -45,18 +44,20 @@ public class ClientService {
 
     @Transactional(readOnly = true)
     public ClientResponse getClientById(UUID id) {
-        Client client = clientRepository.findClientById(id).orElseThrow(EntityNotFoundException::new);
+        Client client = clientRepository.findClientById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Client not found"));
         return clientMapper.toResponse(client);
     }
 
     public Client getClientEntityById(UUID id) {
         return clientRepository.findClientById(id)
-            .orElseThrow(EntityNotFoundException::new);
+            .orElseThrow(() -> new EntityNotFoundException("Client not found"));
     }
 
     @Transactional
     public ClientResponse changeClientById(UUID id, ClientUpdateRequest request) {
-        Client client = clientRepository.findClientById(id).orElseThrow(EntityNotFoundException::new);
+        Client client = clientRepository.findClientById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Client not found"));
         clientMapper.updateEntity(client, request);
         clientRepository.save(client);
         log.info("updated client with id: {}", client.getId());

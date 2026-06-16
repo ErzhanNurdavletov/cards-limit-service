@@ -5,6 +5,9 @@ import kg.bakaibank.cardslimitservice.entity.Card;
 import kg.bakaibank.cardslimitservice.entity.CardCustomLimit;
 import kg.bakaibank.cardslimitservice.entity.CardCustomLimitCompositeKey;
 import kg.bakaibank.cardslimitservice.entity.Limit;
+import kg.bakaibank.cardslimitservice.entity.enums.CardStatus;
+import kg.bakaibank.cardslimitservice.exception.CardIsBlockedException;
+import kg.bakaibank.cardslimitservice.exception.NewAmountCountMoreThanMaxLimitException;
 import kg.bakaibank.cardslimitservice.mapper.CardCustomLimitMapper;
 import kg.bakaibank.cardslimitservice.payload.request.CardLimitUpdateRequest;
 import kg.bakaibank.cardslimitservice.payload.response.CardLimitResponse;
@@ -28,45 +31,27 @@ public class CardCustomLimitService {
     private final CardCustomLimitMapper cardCustomLimitMapper;
 
     @Transactional
-    public void addDefaultLimitToCard(Card card, Limit limit) {
-        CardCustomLimit customLimit = createCardCustomLimit(card, limit);
-        cardCustomLimitRepository.save(customLimit);
-
-        card.getCustomLimits().add(customLimit);
-        if (limit.getCardsCustomLimits() == null) {
-            limit.setCardsCustomLimits(new HashSet<>());
-        }
-        limit.getCardsCustomLimits().add(customLimit);
-
-        log.info("Added default limit with id: {} to card with id: {}", limit.getId(), card.getId());
-    }
-
-    public CardCustomLimit createCardCustomLimit(Card card, Limit limit) {
-        CardCustomLimitCompositeKey compositeKey = getCompositeKey(card, limit);
-
-        CardCustomLimit customLimit = new CardCustomLimit();
-        customLimit.setId(compositeKey);
-        customLimit.setCard(card);
-        customLimit.setLimit(limit);
-        customLimit.setCurrentAmount(limit.getDefaultAmount());
-        customLimit.setCurrentCount(limit.getDefaultCount());
-        return customLimit;
-    }
-
-    @Transactional
     public CardLimitResponse updateCardLimit(UUID cardId, UUID limitId,
                                              CardLimitUpdateRequest request) {
         CardCustomLimitCompositeKey id = new CardCustomLimitCompositeKey();
         id.setCardId(cardId);
         id.setLimitId(limitId);
         CardCustomLimit cardCustomLimit = cardCustomLimitRepository.findByIdWithLimitName(id)
-            .orElseThrow(EntityNotFoundException::new);
+            .orElseThrow(() -> new EntityNotFoundException("cardCustomLimit not found"));
+        log.info("custom limit of card found. customLimitId: {}", id);
+        Card card = cardCustomLimit.getCard();
+        if (card.getStatus() == CardStatus.BLOCKED) {
+            log.info("Card is blocked. id: {}", cardId);
+            throw new CardIsBlockedException("Card is blocked. id: " + cardId);
+        }
+        Limit limit = cardCustomLimit.getLimit();
 
         BigDecimal oldAmount = cardCustomLimit.getCurrentAmount();
         Integer oldCount = cardCustomLimit.getCurrentCount();
 
-        Card card = cardCustomLimit.getCard();
-        Limit limit = cardCustomLimit.getLimit();
+        validateNewAmountAndCount(request.newAmount(), request.newCount(),
+            limit.getMaxAmount(), limit.getMaxCount());
+
         limitsHistoryService.createLimitHistory(card, limit,
             oldAmount, oldCount,
             request.newAmount(), request.newCount());
@@ -83,9 +68,29 @@ public class CardCustomLimitService {
     }
 
     @Transactional
-    public void save(CardCustomLimit cardCustomLimit) {
-        cardCustomLimitRepository.save(cardCustomLimit);
-        log.info("Saved card's custom limit with id: {}", cardCustomLimit.getId());
+    public void addDefaultLimitToCard(Card card, Limit limit) {
+        CardCustomLimit customLimit = createCardCustomLimit(card, limit);
+        cardCustomLimitRepository.save(customLimit);
+
+        card.getCustomLimits().add(customLimit);
+        if (limit.getCardsCustomLimits() == null) {
+            limit.setCardsCustomLimits(new HashSet<>());
+        }
+        limit.getCardsCustomLimits().add(customLimit);
+
+        log.info("Added default limit with id: {} to card with id: {}", limit.getId(), card.getId());
+    }
+
+    private CardCustomLimit createCardCustomLimit(Card card, Limit limit) {
+        CardCustomLimitCompositeKey compositeKey = getCompositeKey(card, limit);
+
+        CardCustomLimit customLimit = new CardCustomLimit();
+        customLimit.setId(compositeKey);
+        customLimit.setCard(card);
+        customLimit.setLimit(limit);
+        customLimit.setCurrentAmount(limit.getDefaultAmount());
+        customLimit.setCurrentCount(limit.getDefaultCount());
+        return customLimit;
     }
 
     private CardCustomLimitCompositeKey getCompositeKey(Card card, Limit limit) {
@@ -94,5 +99,23 @@ public class CardCustomLimitService {
         compositeKey.setLimitId(limit.getId());
         log.debug("created composite key with cardId: {} and limitId: {}", card.getId(), limit.getId());
         return compositeKey;
+    }
+
+    private void validateNewAmountAndCount(BigDecimal newAmount, Integer newCount,
+                                           BigDecimal maxAllowedAmount, Integer maxAllowedCount) {
+        if (newAmount.compareTo(maxAllowedAmount) > 0 && newCount > maxAllowedCount) {
+            throw new NewAmountCountMoreThanMaxLimitException("newAmount more than maxAllowedAmount and" +
+                " newCount more than maxAllowedCount");
+        } else if (newAmount.compareTo(maxAllowedAmount) > 0) {
+            throw new NewAmountCountMoreThanMaxLimitException("newAmount more than maxAllowedAmount");
+        } else if (newCount > maxAllowedCount) {
+            throw new NewAmountCountMoreThanMaxLimitException("newCount more than maxAllowedCount");
+        }
+    }
+
+    @Transactional
+    public void save(CardCustomLimit cardCustomLimit) {
+        cardCustomLimitRepository.save(cardCustomLimit);
+        log.info("Saved card's custom limit with id: {}", cardCustomLimit.getId());
     }
 }

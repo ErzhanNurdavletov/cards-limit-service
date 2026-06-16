@@ -12,6 +12,7 @@ public record CardResponse(
     CardType type,
     CardStatus status,
     OffsetDateTime openedAt,
-    OffsetDateTime closedAt
+    OffsetDateTime closedAt,
+    String cardIssueTypeName
 ) {
 }

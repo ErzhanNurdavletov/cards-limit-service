@@ -17,10 +17,11 @@ import java.util.UUID;
 public class CardIssueType {
 
     @Id
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, unique = true, length = 100)
     private String name;
 
     @OneToMany(mappedBy = "issueType")

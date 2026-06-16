@@ -48,6 +48,6 @@ public class Card {
     private OffsetDateTime closedAt;
 
     @ManyToOne
-    @JoinColumn(name = "issue_type_id")
+    @JoinColumn(name = "issue_type_id", nullable = false)
     private CardIssueType issueType;
 }

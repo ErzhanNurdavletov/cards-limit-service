@@ -29,6 +29,7 @@ public class CardService {
     private final LimitService limitService;
     private final LimitsHistoryService limitsHistoryService;
     private final CardCustomLimitService cardCustomLimitService;
+    private final CardIssueTypeService cardIssueTypeService;
     private final CardMapper cardMapper;
     private final CardCustomLimitMapper cardCustomLimitMapper;
     private final DefaultLimitsConfig defaultLimitsConfig;
@@ -36,9 +37,12 @@ public class CardService {
     @Transactional
     public CardResponse createCard(CardCreateRequest request) {
         Client client = clientService.getClientEntityById(request.clientId());
+        CardIssueType cardIssueType = cardIssueTypeService
+            .findCardIssueTypeByName(request.cardIssueTypeName().trim());
 
         Card card = cardMapper.toEntity(request);
         card.setClient(client);
+        card.setIssueType(cardIssueType);
         card.setId(UUID.randomUUID());
         card.setOpenedAt(OffsetDateTime.now());
         card.setClosedAt(OffsetDateTime.now().plusYears(3));
@@ -56,13 +60,17 @@ public class CardService {
 
         cardRepository.save(card);
         log.info("Saved card with id: {}", card.getId());
-        return cardMapper.toCreateResponse(card, request.clientId());
+        return cardMapper.toCreateResponse(card, request.clientId(), cardIssueType.getName());
     }
 
     @Transactional
     public CardResponse updateCard(UUID id, CardUpdateRequest request) {
-        Card card = cardRepository.findCardById(id).orElseThrow(EntityNotFoundException::new);
+        Card card = cardRepository.findCardById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Card not found"));
+        CardIssueType cardIssueType = cardIssueTypeService
+            .findCardIssueTypeByName(request.cardIssueTypeName().trim());
         cardMapper.updateEntity(card, request);
+        card.setIssueType(cardIssueType);
         cardRepository.save(card);
         log.info("Updated card with id: {}", id);
         return cardMapper.toResponse(card);
@@ -70,18 +78,21 @@ public class CardService {
 
     @Transactional(readOnly = true)
     public CardResponse getCardById(UUID id) {
-        Card card = cardRepository.findCardById(id).orElseThrow(EntityNotFoundException::new);
+        Card card = cardRepository.findCardById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Card not found"));
         log.debug("Given card info with id: {}", id);
         return cardMapper.toResponse(card);
     }
 
     @Transactional(readOnly = true)
     public Set<CardLimitResponse> getCardLimits(UUID cardId) {
-        Card card = cardRepository.findCardById(cardId).orElseThrow(EntityNotFoundException::new);
+        Card card = cardRepository.findCardById(cardId)
+            .orElseThrow(() -> new EntityNotFoundException("Card not found"));
         return cardCustomLimitMapper.toCardLimitsResponses(card.getCustomLimits());
     }
 
     public Card getCardEntityById(UUID cardId) {
-        return cardRepository.findCardById(cardId).orElseThrow(EntityNotFoundException::new);
+        return cardRepository.findCardById(cardId)
+            .orElseThrow(() -> new EntityNotFoundException("Card not found"));
     }
 }

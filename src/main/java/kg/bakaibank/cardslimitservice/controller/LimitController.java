@@ -30,6 +30,7 @@ public class LimitController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateLimit(@PathVariable UUID id,
                                          @Valid @RequestBody LimitUpdateRequest request) {
+        log.info("PUT /api/v1/limits/{} - updateLimit request={}", id, request);
         LimitResponse response = limitService.changeLimitById(id, request);
         log.info("PUT /api/v1/limits/{} - updateLimit response={}", id, response);
         return ResponseEntity.status(HttpStatus.OK).body(response);

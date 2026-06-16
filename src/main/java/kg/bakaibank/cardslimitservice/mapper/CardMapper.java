@@ -16,11 +16,13 @@ public interface CardMapper {
     Card toEntity(CardCreateRequest request);
 
     @Mapping(target = "clientId", source = "card.client.id")
+    @Mapping(target = "cardIssueTypeName", source = "card.issueType.name")
     CardResponse toResponse(Card card);
 
     @Mapping(target = "id", source = "card.id")
     @Mapping(target = "clientId", source = "clientId")
-    CardResponse toCreateResponse(Card card, UUID clientId);
+    @Mapping(target = "cardIssueTypeName", source = "cardIssueTypeName")
+    CardResponse toCreateResponse(Card card, UUID clientId, String cardIssueTypeName);
 
     void updateEntity(@MappingTarget Card card, CardUpdateRequest request);
 }
