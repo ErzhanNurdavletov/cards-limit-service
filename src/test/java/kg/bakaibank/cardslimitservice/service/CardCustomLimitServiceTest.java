@@ -6,7 +6,7 @@ import kg.bakaibank.cardslimitservice.entity.enums.CardType;
 import kg.bakaibank.cardslimitservice.entity.enums.ClientType;
 import kg.bakaibank.cardslimitservice.exception.CardIsBlockedException;
 import kg.bakaibank.cardslimitservice.mapper.CardCustomLimitMapper;
-import kg.bakaibank.cardslimitservice.payload.request.CardLimitUpdateRequest;
+import kg.bakaibank.cardslimitservice.payload.request.CardLimitRequest;
 import kg.bakaibank.cardslimitservice.payload.response.CardLimitResponse;
 import kg.bakaibank.cardslimitservice.repository.CardCustomLimitRepository;
 import org.junit.jupiter.api.Assertions;
@@ -16,7 +16,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -40,7 +39,7 @@ public class CardCustomLimitServiceTest {
 
     @Test
     public void updateCardLimit_Success() {
-        CardLimitUpdateRequest request = new CardLimitUpdateRequest(
+        CardLimitRequest request = new CardLimitRequest(
             new BigDecimal("6767"),
             67);
         CardCustomLimit cardLimit = createTestCardLimit(CardStatus.ACTIVE);
@@ -74,7 +73,7 @@ public class CardCustomLimitServiceTest {
 
     @Test
     public void updateCardLimit_ThrowException() {
-        CardLimitUpdateRequest request = new CardLimitUpdateRequest(
+        CardLimitRequest request = new CardLimitRequest(
             new BigDecimal("6767"),
             67);
 
@@ -92,6 +91,9 @@ public class CardCustomLimitServiceTest {
 
         Mockito.verify(cardCustomLimitRepository, Mockito.never()).save(any());
     }
+    // сервис по переводам между счетами
+    // сервис транзакции
+    // --сваггер
 
     private CardCustomLimit createTestCardLimit(CardStatus status) {
         UUID cardId = UUID.randomUUID();

@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
-public record CardLimitUpdateRequest(
+public record CardLimitRequest(
 
     @NotNull(message = "newAmount can't be empty or null")
     @Min(value = 0, message = "newAmount can't be less than 0")

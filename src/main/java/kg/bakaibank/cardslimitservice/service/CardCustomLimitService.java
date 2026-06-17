@@ -9,7 +9,7 @@ import kg.bakaibank.cardslimitservice.entity.enums.CardStatus;
 import kg.bakaibank.cardslimitservice.exception.CardIsBlockedException;
 import kg.bakaibank.cardslimitservice.exception.NewAmountCountMoreThanMaxLimitException;
 import kg.bakaibank.cardslimitservice.mapper.CardCustomLimitMapper;
-import kg.bakaibank.cardslimitservice.payload.request.CardLimitUpdateRequest;
+import kg.bakaibank.cardslimitservice.payload.request.CardLimitRequest;
 import kg.bakaibank.cardslimitservice.payload.response.CardLimitResponse;
 import kg.bakaibank.cardslimitservice.repository.CardCustomLimitRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class CardCustomLimitService {
 
     @Transactional
     public CardLimitResponse updateCardLimit(UUID cardId, UUID limitId,
-                                             CardLimitUpdateRequest request) {
+                                             CardLimitRequest request) {
         CardCustomLimitCompositeKey id = new CardCustomLimitCompositeKey();
         id.setCardId(cardId);
         id.setLimitId(limitId);

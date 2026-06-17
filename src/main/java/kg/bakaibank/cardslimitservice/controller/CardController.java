@@ -2,7 +2,7 @@ package kg.bakaibank.cardslimitservice.controller;
 
 import jakarta.validation.Valid;
 import kg.bakaibank.cardslimitservice.payload.request.CardCreateRequest;
-import kg.bakaibank.cardslimitservice.payload.request.CardLimitUpdateRequest;
+import kg.bakaibank.cardslimitservice.payload.request.CardLimitRequest;
 import kg.bakaibank.cardslimitservice.payload.request.CardUpdateRequest;
 import kg.bakaibank.cardslimitservice.payload.response.CardLimitResponse;
 import kg.bakaibank.cardslimitservice.payload.response.CardResponse;
@@ -40,13 +40,6 @@ public class CardController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-//    @DeleteMapping("/{cardId}")
-//    public ResponseEntity<?> deleteCard(@PathVariable UUID cardId) {
-//        CardResponse response = cardService.deleteCard(cardId);
-//        log.info("DELETE /api/v1/cards/{} - deleteCard response={}", cardId, response);
-//        return ResponseEntity.status(HttpStatus.OK).body(response);
-//    }
-
     @GetMapping("/{cardId}")
     public ResponseEntity<?> getCard(@PathVariable UUID cardId) {
         CardResponse response = cardService.getCardById(cardId);
@@ -64,7 +57,7 @@ public class CardController {
     @PutMapping("/{cardId}/limits/{limitId}")
     public ResponseEntity<?> updateCardLimit(@PathVariable UUID cardId,
                                              @PathVariable UUID limitId,
-                                             @Valid @RequestBody CardLimitUpdateRequest request) {
+                                             @Valid @RequestBody CardLimitRequest request) {
         log.info("PUT /api/v1/cards/{}/limits/{} - updateCardLimit request={}", cardId, limitId, request);
         CardLimitResponse response = cardCustomLimitService.updateCardLimit(cardId, limitId, request);
         log.info("PUT /api/v1/cards/{}/limits/{} - updateCardLimit response={}", cardId, limitId, response);

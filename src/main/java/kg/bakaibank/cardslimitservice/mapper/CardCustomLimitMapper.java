@@ -1,7 +1,6 @@
 package kg.bakaibank.cardslimitservice.mapper;
 
 import kg.bakaibank.cardslimitservice.entity.CardCustomLimit;
-import kg.bakaibank.cardslimitservice.payload.request.CardLimitUpdateRequest;
 import kg.bakaibank.cardslimitservice.payload.response.CardLimitResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
