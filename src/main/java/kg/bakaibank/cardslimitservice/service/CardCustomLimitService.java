@@ -5,8 +5,6 @@ import kg.bakaibank.cardslimitservice.entity.Card;
 import kg.bakaibank.cardslimitservice.entity.CardCustomLimit;
 import kg.bakaibank.cardslimitservice.entity.CardCustomLimitCompositeKey;
 import kg.bakaibank.cardslimitservice.entity.Limit;
-import kg.bakaibank.cardslimitservice.entity.enums.CardStatus;
-import kg.bakaibank.cardslimitservice.exception.CardIsBlockedException;
 import kg.bakaibank.cardslimitservice.exception.NewAmountCountMoreThanMaxLimitException;
 import kg.bakaibank.cardslimitservice.mapper.CardCustomLimitMapper;
 import kg.bakaibank.cardslimitservice.payload.request.CardLimitRequest;
@@ -19,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -30,44 +29,6 @@ public class CardCustomLimitService {
     private final LimitsHistoryService limitsHistoryService;
     private final CardCustomLimitMapper cardCustomLimitMapper;
 
-    @Transactional
-    public CardLimitResponse updateCardLimit(UUID cardId, UUID limitId,
-                                             CardLimitRequest request) {
-        CardCustomLimitCompositeKey id = new CardCustomLimitCompositeKey();
-        id.setCardId(cardId);
-        id.setLimitId(limitId);
-        CardCustomLimit cardCustomLimit = cardCustomLimitRepository.findByIdWithLimitName(id)
-            .orElseThrow(() -> new EntityNotFoundException("cardCustomLimit not found"));
-        log.info("custom limit of card found. customLimitId: {}", id);
-        Card card = cardCustomLimit.getCard();
-        if (card.getStatus() == CardStatus.BLOCKED) {
-            log.info("Card is blocked. id: {}", cardId);
-            throw new CardIsBlockedException("Card is blocked. id: " + cardId);
-        }
-        Limit limit = cardCustomLimit.getLimit();
-
-        BigDecimal oldAmount = cardCustomLimit.getCurrentAmount();
-        Integer oldCount = cardCustomLimit.getCurrentCount();
-
-        validateNewAmountAndCount(request.newAmount(), request.newCount(),
-            limit.getMaxAmount(), limit.getMaxCount());
-
-        limitsHistoryService.createLimitHistory(card, limit,
-            oldAmount, oldCount,
-            request.newAmount(), request.newCount());
-
-        cardCustomLimit.setCurrentAmount(request.newAmount());
-        cardCustomLimit.setCurrentCount(request.newCount());
-        cardCustomLimitRepository.save(cardCustomLimit);
-
-        log.info("Updated card custom limit with id: {}." +
-                " oldAmount = {}, newAmount = {}. oldCount = {}, newCount = {}",
-            id, oldAmount, cardCustomLimit.getCurrentAmount(),
-            oldCount, cardCustomLimit.getCurrentCount());
-        return cardCustomLimitMapper.toResponse(cardCustomLimit);
-    }
-
-    @Transactional
     public void addDefaultLimitToCard(Card card, Limit limit) {
         CardCustomLimit customLimit = createCardCustomLimit(card, limit);
         cardCustomLimitRepository.save(customLimit);
@@ -83,7 +44,6 @@ public class CardCustomLimitService {
 
     private CardCustomLimit createCardCustomLimit(Card card, Limit limit) {
         CardCustomLimitCompositeKey compositeKey = getCompositeKey(card, limit);
-
         CardCustomLimit customLimit = new CardCustomLimit();
         customLimit.setId(compositeKey);
         customLimit.setCard(card);
@@ -117,5 +77,36 @@ public class CardCustomLimitService {
     public void save(CardCustomLimit cardCustomLimit) {
         cardCustomLimitRepository.save(cardCustomLimit);
         log.info("Saved card's custom limit with id: {}", cardCustomLimit.getId());
+    }
+
+    public CardCustomLimit findByCardIdAndLimitId(UUID cardId, UUID limitId) {
+        return cardCustomLimitRepository.findByCardIdAndLimitId(cardId, limitId)
+            .orElseThrow(() -> new EntityNotFoundException("Card's custom limit not found"));
+    }
+
+    @Transactional
+    public Set<CardLimitResponse> findAllByCardId(UUID cardId) {
+        Set<CardCustomLimit> cardCustomLimits = cardCustomLimitRepository.findAllByCardId(cardId)
+            .orElseThrow(() -> new EntityNotFoundException("Card's custom limit not found"));
+
+        return cardCustomLimitMapper.toCardLimitsResponses(cardCustomLimits);
+    }
+
+    public CardLimitResponse updateCardLimit(UUID cardId, Limit limit,
+                                CardLimitRequest request) {
+
+        CardCustomLimit cardLimit = findByCardIdAndLimitId(cardId, limit.getId());
+        validateNewAmountAndCount(request.newAmount(), request.newCount(),
+            limit.getMaxAmount(), limit.getMaxCount());
+
+        BigDecimal oldAmount = cardLimit.getCurrentAmount();
+        Integer oldCount = cardLimit.getCurrentCount();
+
+        cardLimit.setCurrentAmount(request.newAmount());
+        cardLimit.setCurrentCount(request.newCount());
+
+        limitsHistoryService.createLimitHistory(cardLimit.getCard().getId(),
+            limit.getId(), oldAmount, oldCount, request.newAmount(), request.newCount());
+        return cardCustomLimitMapper.toResponse(cardLimit);
     }
 }

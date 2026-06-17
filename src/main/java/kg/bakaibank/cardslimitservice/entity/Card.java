@@ -20,6 +20,7 @@ import java.util.UUID;
 public class Card {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "card_id")
     private UUID id;
 

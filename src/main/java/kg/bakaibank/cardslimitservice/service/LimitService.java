@@ -1,6 +1,7 @@
 package kg.bakaibank.cardslimitservice.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import kg.bakaibank.cardslimitservice.config.DefaultLimitsConfig;
 import kg.bakaibank.cardslimitservice.entity.Limit;
 import kg.bakaibank.cardslimitservice.mapper.LimitMapper;
 import kg.bakaibank.cardslimitservice.payload.request.LimitCreateRequest;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -21,6 +23,7 @@ import java.util.UUID;
 public class LimitService {
     private final LimitRepository limitRepository;
     private final LimitMapper limitMapper;
+    private final DefaultLimitsConfig defaultLimitsConfig;
 
     @Transactional
     public LimitResponse createLimit(LimitCreateRequest request) {
@@ -57,7 +60,13 @@ public class LimitService {
         return limitMapper.toResponse(limit);
     }
 
-    public Limit getLimitByName(String name) {
+    public Set<Limit> getDefaultLimits() {
+        Limit cashInLimit = getLimitByName(defaultLimitsConfig.getCashIn());
+        Limit cashOutLimit = getLimitByName(defaultLimitsConfig.getCashOut());
+        return Set.of(cashInLimit, cashOutLimit);
+    }
+
+    private Limit getLimitByName(String name) {
         return limitRepository.findLimitByName(name)
             .orElseThrow(() -> new EntityNotFoundException("Limit not found"));
     }

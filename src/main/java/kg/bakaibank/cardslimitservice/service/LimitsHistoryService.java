@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +37,25 @@ public class LimitsHistoryService {
         limitHistory.setCardId(card.getId());
         limitHistory.setChangedAt(OffsetDateTime.now());
         limitHistory.setLimitId(limit.getId());
+        limitHistory.setNewAmount(newAmount);
+        limitHistory.setNewCount(newCount);
+        limitHistory.setOldAmount(oldAmount);
+        limitHistory.setOldCount(oldCount);
+        limitsHistoryRepository.save(limitHistory);
+        log.info("Created limit history record with id: {}", limitHistory.getId());
+    }
+
+    public void createLimitHistory(UUID cardId,
+                                   UUID limitId,
+                                   BigDecimal oldAmount,
+                                   Integer oldCount,
+                                   BigDecimal newAmount,
+                                   Integer newCount) {
+
+        LimitsHistory limitHistory = new LimitsHistory();
+        limitHistory.setCardId(cardId);
+        limitHistory.setChangedAt(OffsetDateTime.now());
+        limitHistory.setLimitId(limitId);
         limitHistory.setNewAmount(newAmount);
         limitHistory.setNewCount(newCount);
         limitHistory.setOldAmount(oldAmount);
