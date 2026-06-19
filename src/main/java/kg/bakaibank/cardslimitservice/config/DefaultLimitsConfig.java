@@ -10,6 +10,6 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 public class DefaultLimitsConfig {
-    private String cashIn;
-    private String cashOut;
+    private String withdrawalLimit;
+    private String transferLimit;
 }

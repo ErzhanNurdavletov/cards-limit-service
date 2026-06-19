@@ -8,7 +8,9 @@ import kg.bakaibank.cardslimitservice.entity.Limit;
 import kg.bakaibank.cardslimitservice.exception.NewAmountCountMoreThanMaxLimitException;
 import kg.bakaibank.cardslimitservice.mapper.CardCustomLimitMapper;
 import kg.bakaibank.cardslimitservice.payload.request.CardLimitRequest;
+import kg.bakaibank.cardslimitservice.payload.request.PaymentPermissionRequest;
 import kg.bakaibank.cardslimitservice.payload.response.CardLimitResponse;
+import kg.bakaibank.cardslimitservice.payload.response.PaymentPermissionResponse;
 import kg.bakaibank.cardslimitservice.repository.CardCustomLimitRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -108,5 +110,12 @@ public class CardCustomLimitService {
         limitsHistoryService.createLimitHistory(cardLimit.getCard().getId(),
             limit.getId(), oldAmount, oldCount, request.newAmount(), request.newCount());
         return cardCustomLimitMapper.toResponse(cardLimit);
+    }
+
+    public PaymentPermissionResponse checkIfPaymentInLimit(UUID cardId, UUID limitId,
+                                                           PaymentPermissionRequest request) {
+        CardCustomLimit cardLimit = findByCardIdAndLimitId(cardId, limitId);
+        boolean isAllowed = request.todayPaymentAmount().compareTo(cardLimit.getCurrentAmount()) <= 0;
+        return new PaymentPermissionResponse(isAllowed);
     }
 }

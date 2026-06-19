@@ -9,7 +9,7 @@ import java.time.OffsetDateTime;
 public record CardUpdateRequest(
 
     @NotBlank(message = "pan can't be null or empty or blank")
-    @Size(max = 19, message = "pan length can't be more than 19")
+    @Pattern(regexp = "^\\d{16}$", message = "pan length must be 16")
     String maskedPan,
 
     @NotNull(message = "type can be only DEBIT or CREDIT")

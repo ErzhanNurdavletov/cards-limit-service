@@ -1,7 +1,6 @@
 package kg.bakaibank.cardslimitservice.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import kg.bakaibank.cardslimitservice.config.DefaultLimitsConfig;
 import kg.bakaibank.cardslimitservice.entity.*;
 import kg.bakaibank.cardslimitservice.entity.enums.CardStatus;
 import kg.bakaibank.cardslimitservice.exception.CardIsBlockedException;
@@ -67,6 +66,7 @@ public class CardService {
             .maskedPan(request.maskedPan())
             .openedAt(OffsetDateTime.now())
             .closedAt(OffsetDateTime.now().plusYears(3))
+            .accountId(request.accountId())
             .build();
         cardRepository.save(card);
         return card;

@@ -61,9 +61,9 @@ public class LimitService {
     }
 
     public Set<Limit> getDefaultLimits() {
-        Limit cashInLimit = getLimitByName(defaultLimitsConfig.getCashIn());
-        Limit cashOutLimit = getLimitByName(defaultLimitsConfig.getCashOut());
-        return Set.of(cashInLimit, cashOutLimit);
+        Limit withdrawalLimit = getLimitByName(defaultLimitsConfig.getWithdrawalLimit());
+        Limit transferLimit = getLimitByName(defaultLimitsConfig.getTransferLimit());
+        return Set.of(withdrawalLimit, transferLimit);
     }
 
     private Limit getLimitByName(String name) {

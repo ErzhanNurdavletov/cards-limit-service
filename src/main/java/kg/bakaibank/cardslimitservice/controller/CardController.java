@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import kg.bakaibank.cardslimitservice.payload.request.CardCreateRequest;
 import kg.bakaibank.cardslimitservice.payload.request.CardUpdateRequest;
 import kg.bakaibank.cardslimitservice.payload.response.CardResponse;
-import kg.bakaibank.cardslimitservice.service.CardFacade;
+import kg.bakaibank.cardslimitservice.service.facade.CardFacade;
 import kg.bakaibank.cardslimitservice.service.CardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

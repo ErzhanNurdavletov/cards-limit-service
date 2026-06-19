@@ -13,6 +13,7 @@ public record CardResponse(
     CardStatus status,
     OffsetDateTime openedAt,
     OffsetDateTime closedAt,
-    String cardIssueTypeName
+    String cardIssueTypeName,
+    UUID accountId
 ) {
 }

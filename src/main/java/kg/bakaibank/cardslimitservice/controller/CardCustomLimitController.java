@@ -2,9 +2,11 @@ package kg.bakaibank.cardslimitservice.controller;
 
 import jakarta.validation.Valid;
 import kg.bakaibank.cardslimitservice.payload.request.CardLimitRequest;
+import kg.bakaibank.cardslimitservice.payload.request.PaymentPermissionRequest;
 import kg.bakaibank.cardslimitservice.payload.response.CardLimitResponse;
+import kg.bakaibank.cardslimitservice.payload.response.PaymentPermissionResponse;
 import kg.bakaibank.cardslimitservice.service.CardCustomLimitService;
-import kg.bakaibank.cardslimitservice.service.CardFacade;
+import kg.bakaibank.cardslimitservice.service.facade.CardFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -38,5 +40,15 @@ public class CardCustomLimitController {
         Set<CardLimitResponse> responses = cardCustomLimitService.findAllByCardId(cardId);
         log.info("GET /api/v1/cards/{}/current-limits ", cardId);
         return ResponseEntity.status(HttpStatus.OK).body(responses);
+    }
+
+    @PostMapping("/{cardId}/limits/{limitId}/limit-check")
+    public ResponseEntity<?> checkIfPaymentNotExceedLimit(@PathVariable UUID cardId,
+                                                          @PathVariable UUID limitId,
+                                      @Valid @RequestBody PaymentPermissionRequest request) {
+        PaymentPermissionResponse response = cardCustomLimitService.checkIfPaymentInLimit(cardId, limitId, request);
+        log.info("POST /api/v1/cards/{}/limits/{}/limit-check" +
+            " - checkIfPaymentNotExceedLimit response={}", cardId, limitId, response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
