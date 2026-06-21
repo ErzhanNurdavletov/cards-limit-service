@@ -1,6 +1,7 @@
 package kg.bakaibank.cardslimitservice.payload.response;
 
 public record PaymentPermissionResponse(
-    boolean isAllowed
+    boolean isAllowedByAmount,
+    boolean isAllowedByCount
 ) {
 }
