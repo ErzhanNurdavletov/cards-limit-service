@@ -52,7 +52,6 @@ public class Card {
     @JoinColumn(name = "issue_type_id", nullable = false)
     private CardIssueType issueType;
 
-    // , nullable = false
-    @Column(name = "account_id")
+    @Column(name = "account_id", unique = true)
     private UUID accountId;
 }

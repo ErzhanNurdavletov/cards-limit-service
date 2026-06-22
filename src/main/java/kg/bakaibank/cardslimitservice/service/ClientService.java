@@ -35,7 +35,7 @@ public class ClientService {
     @Transactional
     public ClientResponse deleteClientById(UUID id) {
         Client client = clientRepository.findByDeletedAtIsNullAndId(id)
-            .orElseThrow(() -> new EntityNotFoundException("Client not found"));
+            .orElseThrow(() -> new EntityNotFoundException("Client with id: " + id + " not found"));
         client.setDeletedAt(OffsetDateTime.now());
         clientRepository.save(client);
         log.info("Marked as deleted client with id: {}", client.getId());
@@ -45,19 +45,19 @@ public class ClientService {
     @Transactional(readOnly = true)
     public ClientResponse getClientById(UUID id) {
         Client client = clientRepository.findClientById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Client not found"));
+            .orElseThrow(() -> new EntityNotFoundException("Client with id: " + id + " not found"));
         return clientMapper.toResponse(client);
     }
 
     public Client getClientEntityById(UUID id) {
         return clientRepository.findClientById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Client not found"));
+            .orElseThrow(() -> new EntityNotFoundException("Client with id: " + id + " not found"));
     }
 
     @Transactional
     public ClientResponse changeClientById(UUID id, ClientUpdateRequest request) {
         Client client = clientRepository.findClientById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Client not found"));
+            .orElseThrow(() -> new EntityNotFoundException("Client with id: " + id + " not found"));
         clientMapper.updateEntity(client, request);
         clientRepository.save(client);
         log.info("updated client with id: {}", client.getId());

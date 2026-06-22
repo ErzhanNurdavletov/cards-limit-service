@@ -114,9 +114,13 @@ public class CardCustomLimitService {
 
     public PaymentPermissionResponse checkIfPaymentInLimit(UUID cardId, UUID limitId,
                                                            PaymentPermissionRequest request) {
+        log.info("PaymentPermissionRequest {}", request);
         CardCustomLimit cardLimit = findByCardIdAndLimitId(cardId, limitId);
+        log.info("CardCustomLimit {}", cardLimit);
         boolean isAllowedByAmount = request.todayPaymentAmount().compareTo(cardLimit.getCurrentAmount()) <= 0;
-        boolean isAllowedByCount = request.todayPaymentCount() < cardLimit.getCurrentCount();
+        boolean isAllowedByCount = request.todayPaymentCount() <= cardLimit.getCurrentCount();
+        log.info("isAllowedByAmount {}", isAllowedByAmount);
+        log.info("isAllowedByCount {}", isAllowedByCount);
         return new PaymentPermissionResponse(isAllowedByAmount, isAllowedByCount);
     }
 }
