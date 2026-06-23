@@ -30,7 +30,7 @@ public class CardService {
     @Transactional
     public CardResponse updateCard(UUID id, CardUpdateRequest request) {
         Card card = cardRepository.findCardById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Card not found"));
+            .orElseThrow(() -> new EntityNotFoundException("Card with id: " + id + " not found"));
         CardIssueType cardIssueType = cardIssueTypeService
             .findCardIssueTypeByName(request.cardIssueTypeName().trim());
         cardMapper.updateEntity(card, request);
@@ -43,14 +43,14 @@ public class CardService {
     @Transactional(readOnly = true)
     public CardResponse getCardById(UUID id) {
         Card card = cardRepository.findCardById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Card not found"));
+            .orElseThrow(() -> new EntityNotFoundException("Card with id: " + id + " not found"));
         log.debug("Given card info with id: {}", id);
         return cardMapper.toResponse(card);
     }
 
     public void checkIsCardActive(UUID cardId) {
         Card card = cardRepository.findCardById(cardId)
-            .orElseThrow(() -> new EntityNotFoundException("Card not found"));
+            .orElseThrow(() -> new EntityNotFoundException("Card with id: " + cardId + " not found"));
         if (card.getStatus() != CardStatus.ACTIVE) {
             throw new CardIsBlockedException("CardId " + cardId + " is blocked");
         }

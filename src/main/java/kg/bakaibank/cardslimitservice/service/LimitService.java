@@ -36,7 +36,7 @@ public class LimitService {
     @Transactional
     public LimitResponse deleteLimit(UUID id) {
         Limit limit = limitRepository.findByDeletedAtIsNullAndId(id)
-            .orElseThrow(() -> new EntityNotFoundException("Limit not found"));
+            .orElseThrow(() -> new EntityNotFoundException("Limit with id: " + id + " not found"));
         limit.setDeletedAt(OffsetDateTime.now());
         limitRepository.save(limit);
         log.info("Marked as deleted limit with id: {}", limit.getId());
@@ -46,14 +46,14 @@ public class LimitService {
     @Transactional(readOnly = true)
     public LimitResponse getLimitById(UUID id) {
         Limit limit = limitRepository.findLimitById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Limit not found"));
+            .orElseThrow(() -> new EntityNotFoundException("Limit with id: " + id + " not found"));
         return limitMapper.toResponse(limit);
     }
 
     @Transactional
     public LimitResponse changeLimitById(UUID id, LimitUpdateRequest request) {
         Limit limit = limitRepository.findLimitById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Limit not found"));
+            .orElseThrow(() -> new EntityNotFoundException("Limit with id: " + id + " not found"));
         limitMapper.updateEntity(limit, request);
         limitRepository.save(limit);
         log.info("Updated limit with id: {}", limit.getId());
@@ -68,11 +68,11 @@ public class LimitService {
 
     private Limit getLimitByName(String name) {
         return limitRepository.findLimitByName(name)
-            .orElseThrow(() -> new EntityNotFoundException("Limit not found"));
+            .orElseThrow(() -> new EntityNotFoundException("Limit with name: " + name + " not found"));
     }
 
     public Limit getLimitEntityById(UUID id) {
         return limitRepository.findLimitById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Limit not found"));
+            .orElseThrow(() -> new EntityNotFoundException("Limit with id: " + id + " not found"));
     }
 }
