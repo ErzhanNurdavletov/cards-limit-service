@@ -33,8 +33,8 @@ public class Client {
     @Column(name = "patronymic")
     private String patronymic;
 
-    @OneToMany
-    private Set<Card> cards = new HashSet<>();
+    @OneToMany(mappedBy = "client")
+    private Set<Card> cards;
 
     @Column(name = "client_type", nullable = false, length = 10)
     @Enumerated(EnumType.STRING)
