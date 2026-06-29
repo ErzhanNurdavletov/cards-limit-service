@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="default-limits-1" author="Эржан">
+        <insert tableName="limits">
+            <column name="limit_id" value="cb728d9d-d41b-4a6b-9f63-46139c09a807"/>
+            <column name="name" value="transfer-limit"/>
+            <column name="max_amount" valueNumeric="1000000"/>
+            <column name="max_count" valueNumeric="500"/>
+            <column name="default_amount" valueNumeric="20000"/>
+            <column name="default_count" valueNumeric="5"/>
+        </insert>
+    </changeSet>
+    <changeSet id="default-limits-2" author="Эржан">
+        <insert tableName="limits">
+            <column name="limit_id" value="132686ca-ded7-4e77-91f6-276ca84ff785"/>
+            <column name="name" value="withdrawal-limit"/>
+            <column name="max_amount" valueNumeric="1000000"/>
+            <column name="max_count" valueNumeric="500"/>
+            <column name="default_amount" valueNumeric="20000"/>
+            <column name="default_count" valueNumeric="5"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

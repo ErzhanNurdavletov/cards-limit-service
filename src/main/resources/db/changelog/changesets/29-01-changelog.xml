@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1782724431618-1" author="Эржан">
+        <createTable tableName="cards">
+            <column name="card_id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_cards"/>
+            </column>
+            <column name="client_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="masked_pan" type="VARCHAR(19)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="opened_at" type="timestamp"/>
+            <column name="closed_at" type="timestamp"/>
+            <column name="issue_type_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="account_id" type="UUID"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1782724431618-2" author="Эржан">
+        <createTable tableName="cards_issue_types">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_cards_issue_types"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1782724431618-3" author="Эржан">
+        <createTable tableName="cards_limits">
+            <column name="current_amount" type="DECIMAL(15, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="current_count" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="card_id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_cards_limits"/>
+            </column>
+            <column name="limit_id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_cards_limits"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1782724431618-4" author="Эржан">
+        <createTable tableName="clients">
+            <column name="client_id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_clients"/>
+            </column>
+            <column name="firstname" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lastname" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="patronymic" type="VARCHAR(255)"/>
+            <column name="client_type" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone_number" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="deleted_at" type="timestamp"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1782724431618-5" author="Эржан">
+        <createTable tableName="limits">
+            <column name="limit_id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_limits"/>
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="max_amount" type="DECIMAL(15, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="max_count" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="default_amount" type="DECIMAL">
+                <constraints nullable="false"/>
+            </column>
+            <column name="default_count" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="deleted_at" type="timestamp"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1782724431618-6" author="Эржан">
+        <createTable tableName="outboxes">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_outboxes"/>
+            </column>
+            <column name="payment_id" type="UUID"/>
+            <column name="payment_status" type="VARCHAR(255)"/>
+            <column name="amount" type="DECIMAL"/>
+            <column name="payment_decline_reason" type="VARCHAR(255)"/>
+            <column name="created_at" type="timestamp"/>
+            <column name="published_at" type="timestamp"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1782724431618-7" author="Эржан">
+        <addUniqueConstraint columnNames="account_id" constraintName="uc_cards_account" tableName="cards"/>
+    </changeSet>
+    <changeSet id="1782724431618-8" author="Эржан">
+        <addUniqueConstraint columnNames="name" constraintName="uc_cards_issue_types_name"
+                             tableName="cards_issue_types"/>
+    </changeSet>
+    <changeSet id="1782724431618-9" author="Эржан">
+        <addUniqueConstraint columnNames="phone_number" constraintName="uc_clients_phone_number" tableName="clients"/>
+    </changeSet>
+    <changeSet id="1782724431618-10" author="Эржан">
+        <addUniqueConstraint columnNames="name" constraintName="uc_limits_name" tableName="limits"/>
+    </changeSet>
+    <changeSet id="1782724431618-11" author="Эржан">
+        <addForeignKeyConstraint baseColumnNames="card_id" baseTableName="cards_limits"
+                                 constraintName="FK_CARDS_LIMITS_ON_CARD" referencedColumnNames="card_id"
+                                 referencedTableName="cards"/>
+    </changeSet>
+    <changeSet id="1782724431618-12" author="Эржан">
+        <addForeignKeyConstraint baseColumnNames="limit_id" baseTableName="cards_limits"
+                                 constraintName="FK_CARDS_LIMITS_ON_LIMIT" referencedColumnNames="limit_id"
+                                 referencedTableName="limits"/>
+    </changeSet>
+    <changeSet id="1782724431618-13" author="Эржан">
+        <addForeignKeyConstraint baseColumnNames="client_id" baseTableName="cards" constraintName="FK_CARDS_ON_CLIENT"
+                                 referencedColumnNames="client_id" referencedTableName="clients"/>
+    </changeSet>
+    <changeSet id="1782724431618-14" author="Эржан">
+        <addForeignKeyConstraint baseColumnNames="issue_type_id" baseTableName="cards"
+                                 constraintName="FK_CARDS_ON_ISSUE_TYPE" referencedColumnNames="id"
+                                 referencedTableName="cards_issue_types"/>
+    </changeSet>
+
+</databaseChangeLog>
