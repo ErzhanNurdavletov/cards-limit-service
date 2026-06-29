@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1782734168212-1" author="Эржан">
+        <createTable tableName="limits_histories">
+            <column name="limit_history_id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_limits_histories"/>
+            </column>
+            <column name="card_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="limit_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="old_amount" type="DECIMAL(15, 2)"/>
+            <column name="new_amount" type="DECIMAL(15, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="old_count" type="INT"/>
+            <column name="new_count" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="changed_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

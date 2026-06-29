@@ -5,7 +5,6 @@ import kg.bakaibank.cardslimitservice.entity.enums.ClientType;
 import lombok.*;
 
 import java.time.OffsetDateTime;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
