@@ -1,8 +1,8 @@
 package kg.bakaibank.cardslimitservice.entity;
 
 import jakarta.persistence.*;
-import kg.bakaibank.cardslimitservice.outbox.PaymentDeclineReason;
-import kg.bakaibank.cardslimitservice.outbox.PaymentStatus;
+import kg.bakaibank.cardslimitservice.outbox.event.enums.PaymentDeclineReason;
+import kg.bakaibank.cardslimitservice.outbox.event.enums.PaymentStatus;
 import lombok.*;
 
 import java.math.BigDecimal;

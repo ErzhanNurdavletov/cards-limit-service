@@ -1,5 +1,6 @@
-package kg.bakaibank.cardslimitservice.outbox;
+package kg.bakaibank.cardslimitservice.outbox.service;
 
+import kg.bakaibank.cardslimitservice.outbox.event.OutboxEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;

@@ -1,6 +1,8 @@
-package kg.bakaibank.cardslimitservice.outbox;
+package kg.bakaibank.cardslimitservice.outbox.service;
 
 import kg.bakaibank.cardslimitservice.entity.Outbox;
+import kg.bakaibank.cardslimitservice.outbox.repository.OutboxRepository;
+import kg.bakaibank.cardslimitservice.outbox.event.OutboxEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

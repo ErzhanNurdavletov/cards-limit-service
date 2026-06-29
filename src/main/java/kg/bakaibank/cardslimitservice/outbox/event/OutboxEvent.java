@@ -1,4 +1,7 @@
-package kg.bakaibank.cardslimitservice.outbox;
+package kg.bakaibank.cardslimitservice.outbox.event;
+
+import kg.bakaibank.cardslimitservice.outbox.event.enums.PaymentDeclineReason;
+import kg.bakaibank.cardslimitservice.outbox.event.enums.PaymentStatus;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;

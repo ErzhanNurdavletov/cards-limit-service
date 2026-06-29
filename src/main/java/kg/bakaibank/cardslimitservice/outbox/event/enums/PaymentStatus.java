@@ -1,4 +1,4 @@
-package kg.bakaibank.cardslimitservice.outbox;
+package kg.bakaibank.cardslimitservice.outbox.event.enums;
 
 public enum PaymentStatus {
     NEW,

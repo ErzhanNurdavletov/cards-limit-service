@@ -1,4 +1,4 @@
-package kg.bakaibank.cardslimitservice.outbox;
+package kg.bakaibank.cardslimitservice.outbox.repository;
 
 import kg.bakaibank.cardslimitservice.entity.Outbox;
 import org.springframework.data.jpa.repository.JpaRepository;
