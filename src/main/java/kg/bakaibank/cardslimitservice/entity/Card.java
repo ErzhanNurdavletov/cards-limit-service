@@ -49,7 +49,7 @@ public class Card {
     private OffsetDateTime closedAt;
 
     @ManyToOne
-    @JoinColumn(name = "issue_type_id", nullable = false)
+    @JoinColumn(name = "issue_type_id")
     private CardIssueType issueType;
 
     @Column(name = "account_id", unique = true)
